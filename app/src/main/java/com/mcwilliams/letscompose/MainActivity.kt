@@ -20,14 +20,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LetsComposeTheme {
-                Greeting("Android")
+                Container()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String) {
+fun Container() {
     Scaffold(
         topAppBar = {
             TopAppBar(
@@ -40,7 +40,7 @@ fun Greeting(name: String) {
             )
         },
         bodyContent = {
-            Text(text = "Hello $name!")
+            Text(text = "Hello World")
         },
         bottomAppBar = {
             BottomNavigation(
@@ -76,6 +76,6 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
     LetsComposeTheme {
-        Greeting("Android")
+        Container()
     }
 }

@@ -8,11 +8,8 @@ import androidx.ui.core.setContent
 import androidx.ui.foundation.Icon
 import androidx.ui.foundation.Text
 import androidx.ui.foundation.VerticalScroller
-import androidx.ui.foundation.shape.corner.CutCornerShape
-import androidx.ui.graphics.Color
 import androidx.ui.layout.*
 import androidx.ui.material.*
-import androidx.ui.res.imageResource
 import androidx.ui.res.vectorResource
 import androidx.ui.text.style.TextOverflow
 import androidx.ui.tooling.preview.Preview
@@ -33,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun Container() {
     Scaffold(
-        topAppBar = {
+         topBar = {
             TopAppBar(
                 title = { Text(text = "Lets Compose") }
 //                navigationIcon = {
@@ -46,7 +43,7 @@ fun Container() {
         bodyContent = {
             homeBody()
         },
-        bottomAppBar = {
+        bottomBar = {
             BottomNavigation(
                 content = {
                     listOf(

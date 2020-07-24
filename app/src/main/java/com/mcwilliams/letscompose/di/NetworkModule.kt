@@ -1,6 +1,7 @@
 package com.mcwilliams.letscompose.di
 
 import com.mcwilliams.letscompose.network.LocationApi
+import com.mcwilliams.letscompose.network.WeatherApi
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -33,6 +34,13 @@ object NetworkModule {
     }
 
     @Provides
+    @Reusable
+    @JvmStatic
+    internal fun provideWeatherApi(@Named("weather") retrofit: Retrofit): WeatherApi {
+        return retrofit.create(WeatherApi::class.java)
+    }
+
+    @Provides
     @Named("geolocation")
     @Reusable
     @JvmStatic
@@ -42,6 +50,21 @@ object NetworkModule {
 
         return Retrofit.Builder()
             .baseUrl("https://api.opencagedata.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient.build())
+            .build()
+    }
+
+    @Provides
+    @Named("weather")
+    @Reusable
+    @JvmStatic
+    internal fun provideWeatherClientApi(
+        okHttpClient: OkHttpClient.Builder
+    ): Retrofit {
+
+        return Retrofit.Builder()
+            .baseUrl("https://api.openweathermap.org/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient.build())
             .build()

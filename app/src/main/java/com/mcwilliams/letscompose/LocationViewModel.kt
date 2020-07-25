@@ -19,12 +19,31 @@ class LocationViewModel @ViewModelInject constructor(
     var _weatherData = MutableLiveData<WeatherData>()
     var weatherData: LiveData<WeatherData> = _weatherData
 
+    var _newSearch = MutableLiveData(false)
+    var newSearch: LiveData<Boolean> = _newSearch
+
     init {
+        getWeatherData("Boerne")
+    }
+
+    fun startNewSearch() {
+        _newSearch.postValue(true)
+    }
+
+    fun search(text: String) {
         viewModelScope.launch {
-            val cityDataByLatLong = locationApi.getLatLongByCity("Boerne")
+            getWeatherData(text)
+        }
+    }
+
+    fun getWeatherData(search: String) {
+        viewModelScope.launch {
+            val cityDataByLatLong = locationApi.getLatLongByCity(search)
             _weatherData.postValue(
-                weatherApi.getLatLongByCity(cityDataByLatLong.results[0].geometry.lat.toString(),
-                    cityDataByLatLong.results[0].geometry.lng.toString())
+                weatherApi.getLatLongByCity(
+                    cityDataByLatLong.results[0].geometry.lat.toString(),
+                    cityDataByLatLong.results[0].geometry.lng.toString()
+                )
             )
         }
     }

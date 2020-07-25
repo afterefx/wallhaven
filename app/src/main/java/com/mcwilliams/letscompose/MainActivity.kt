@@ -7,14 +7,16 @@ import androidx.compose.Composable
 import androidx.compose.getValue
 import androidx.compose.setValue
 import androidx.compose.state
+import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
 import androidx.ui.core.setContent
-import androidx.ui.foundation.Icon
-import androidx.ui.foundation.ScrollableColumn
-import androidx.ui.foundation.Text
+import androidx.ui.foundation.*
+import androidx.ui.input.TextFieldValue
 import androidx.ui.layout.*
 import androidx.ui.livedata.observeAsState
 import androidx.ui.material.*
+import androidx.ui.material.icons.Icons
+import androidx.ui.material.icons.filled.Search
 import androidx.ui.res.vectorResource
 import androidx.ui.unit.dp
 import com.mcwilliams.letscompose.ui.LetsComposeTheme
@@ -50,6 +52,13 @@ fun Container(viewModel: LocationViewModel) {
                 viewmodel = viewModel
             )
         },
+        floatingActionButton = {
+            if (currentScreen == MainActivityScreen.Current) {
+                FloatingActionButton(onClick = {
+                    viewModel.startNewSearch()
+                }, icon = { Image(asset = Icons.Default.Search) })
+            }
+        },
         bottomBar = {
             BottomNavigation(
                 content = {
@@ -74,6 +83,7 @@ fun Container(viewModel: LocationViewModel) {
                 }
             )
         }
+
     )
 }
 
@@ -90,7 +100,7 @@ fun BodyContent(
 ) {
     when (currentScreen) {
         MainActivityScreen.Current -> CurrentWeatherContent(currentScreen, modifier, viewmodel)
-        MainActivityScreen.Forecast -> ForcastContent(modifier)
+        MainActivityScreen.Forecast -> ForecastContent(modifier)
     }
 }
 
@@ -116,19 +126,107 @@ fun CurrentWeatherContent(
     viewmodel: LocationViewModel
 ) {
     val weatherData by viewmodel.weatherData.observeAsState()
+    val startNewSearch by viewmodel.newSearch.observeAsState()
 
     ScrollableColumn(modifier = modifier, children = {
-        Row(modifier = Modifier.padding(8.dp)) {
-            Text(text = "Current Temperature: ")
+        Column(modifier = Modifier.padding(8.dp)) {
             weatherData?.let {
-                Text(text = it.main.temp.toString())
+                Text(
+                    text = "Current Temperature in ${it.name} ",
+                    style = MaterialTheme.typography.h6
+                )
+                Text(text = "${it.main.temp} °F", style = MaterialTheme.typography.h5)
             }
         }
     })
+
+    val onPopupDismissed = { viewmodel._newSearch.postValue(false) }
+
+    if (startNewSearch!!) {
+        showSearchDialog(onPopupDismissed, viewModel = viewmodel)
+    }
+
 }
 
 @Composable
-fun ForcastContent(modifier: Modifier) {
+fun showSearchDialog(onPopupDismissed: () -> Unit, viewModel: LocationViewModel) {
+    val AlertDialogWidth = Modifier.preferredWidth(312.dp)
+    val TitlePadding = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 0.dp)
+    val emphasisLevels = EmphasisAmbient.current
+
+    Dialog(onCloseRequest = onPopupDismissed) {
+        Surface(
+            modifier = AlertDialogWidth,
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Column() {
+                Box(TitlePadding.gravity(Alignment.Start)) {
+                    ProvideEmphasis(emphasisLevels.high) {
+                        val textStyle = MaterialTheme.typography.subtitle1
+                        ProvideTextStyle(textStyle) { Text(text = "Search") }
+                    }
+                }
+
+                Spacer(Modifier.preferredHeight(14.dp))
+
+                //Currently broken in Compose
+                var textValue by state { TextFieldValue("") }
+                FilledTextField(value = textValue,
+                    label = { Text(text = "City, State or Zip") },
+                    modifier = Modifier.padding (16.dp) + Modifier.fillMaxWidth(),
+                    // Update value of textValue with the latest value of the text field
+                    onFocusChanged = {
+                        textValue = TextFieldValue("")
+                    },
+                    onValueChange = {
+                        textValue = it
+                    }
+                )
+
+                Spacer(Modifier.preferredHeight(28.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(
+                        onClick = onPopupDismissed
+                    ) {
+                        Text(text = "Cancel")
+                    }
+                    Spacer(modifier = Modifier.preferredWidth(8.dp))
+                    TextButton(
+                        onClick = {
+                            viewModel.search(textValue.text)
+                        }
+                    ) {
+                        Text(text = "Search")
+                    }
+                }
+            }
+        }
+    }
+//    AlertDialog(
+//        onCloseRequest = onPopupDismissed,
+//        text = {
+//            Text("Congratulations! You just clicked the text successfully")
+//        },
+//        confirmButton = {
+//            // Button is a pre-defined Material Design implementation of a contained button -
+//            // https://material.io/design/components/buttons.html#contained-button.
+//            Button(
+//                onClick = onPopupDismissed
+//            ) {
+//                // The Button composable allows you to provide child composables that inherit
+//                // this button functionality.
+//                // The Text composable is pre-defined by the Compose UI library; you can use this
+//                // composable to render text on the screen
+//                Text(text = "Ok")
+//            }
+//        })
+}
+
+@Composable
+fun ForecastContent(modifier: Modifier) {
     Column(modifier = modifier.height(600.dp)) {
         WebComponent(url = "https://www.google.com", webContext = WebContext())
     }

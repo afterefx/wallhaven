@@ -19,15 +19,8 @@ class LocationViewModel @ViewModelInject constructor(
     var _weatherData = MutableLiveData<WeatherData>()
     var weatherData: LiveData<WeatherData> = _weatherData
 
-    var _newSearch = MutableLiveData(false)
-    var newSearch: LiveData<Boolean> = _newSearch
-
     init {
         getWeatherData("Boerne")
-    }
-
-    fun startNewSearch() {
-        _newSearch.postValue(true)
     }
 
     fun search(text: String) {

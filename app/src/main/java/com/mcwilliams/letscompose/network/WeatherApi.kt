@@ -26,4 +26,14 @@ interface WeatherApi {
         @Query("units") units: String = "Imperial",
         @Query("appid") key: String = "4e29ca8c4547fc74c003c8e58652d710"
     ): WeatherData
+
+    @GET("data/2.5/onecall")
+    suspend fun getAllWeatherData(
+        @Query("lat") lat: String,
+        @Query("lon") long: String,
+        @Query("exclude") exclude: String = "minutely",
+        @Query("units") units: String = "Imperial",
+        @Query("appid") key: String = "4e29ca8c4547fc74c003c8e58652d710"
+    ): com.mcwilliams.letscompose.model.allweatherdata.WeatherData
+
 }

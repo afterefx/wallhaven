@@ -22,16 +22,24 @@ class CurrentWeatherRepository @Inject constructor(
         Context.MODE_PRIVATE
     )
 
-    suspend fun getWeather(search: String): WeatherData {
+    suspend fun getWeather(search: String): com.mcwilliams.letscompose.model.allweatherdata.WeatherData {
         val locations = preferences.getStringSet("locations", mutableSetOf())
         locations!!.add(search)
         preferences.edit().putStringSet("locations", locations).apply()
 
-        val zipOrCity = search.intOrString()
-        return if (zipOrCity is Int) {
-            weatherApi.getWeatherDataByZipCode(zipOrCity.toString())
-        } else
-            weatherApi.getWeatherDataByCity((zipOrCity as String))
+//        val zipOrCity = search.intOrString()
+//        return if (zipOrCity is Int) {
+//            weatherApi.getWeatherDataByZipCode(zipOrCity.toString())
+//        } else
+//            weatherApi.getWeatherDataByCity((zipOrCity as String))
+
+
+        val cityDataByLatLong = locationApi.getLatLongByCity(search)
+        return weatherApi.getAllWeatherData(
+            cityDataByLatLong.results[0].geometry.lat.toString(),
+            cityDataByLatLong.results[0].geometry.lng.toString()
+        )
+
     }
 
     fun String.intOrString() = toIntOrNull() ?: this

@@ -12,8 +12,7 @@ import com.mcwilliams.letscompose.network.WeatherApi
 import kotlinx.coroutines.launch
 
 class CurrentWeatherViewModel @ViewModelInject constructor(
-    private val locationApi: LocationApi,
-    private val weatherApi: WeatherApi
+    private val currentWeatherRepository: CurrentWeatherRepository
 ) : ViewModel() {
 
     var _weatherData = MutableLiveData<WeatherData>()
@@ -31,12 +30,8 @@ class CurrentWeatherViewModel @ViewModelInject constructor(
 
     fun getWeatherData(search: String) {
         viewModelScope.launch {
-            val cityDataByLatLong = locationApi.getLatLongByCity(search)
             _weatherData.postValue(
-                weatherApi.getLatLongByCity(
-                    cityDataByLatLong.results[0].geometry.lat.toString(),
-                    cityDataByLatLong.results[0].geometry.lng.toString()
-                )
+                currentWeatherRepository.getWeather(search = search)
             )
         }
     }

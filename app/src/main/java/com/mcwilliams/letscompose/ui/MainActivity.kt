@@ -21,6 +21,7 @@ import com.mcwilliams.letscompose.R
 import com.mcwilliams.letscompose.customcomposables.WebComponent
 import com.mcwilliams.letscompose.customcomposables.WebContext
 import com.mcwilliams.letscompose.theme.LetsComposeTheme
+import com.mcwilliams.letscompose.ui.current.CurrentWeatherContent
 import com.mcwilliams.letscompose.ui.current.CurrentWeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -113,57 +114,6 @@ fun TopAppBar(currentScreen: MainActivityScreen) {
         title = { Text(text = currentScreen.name) }
     )
 }
-
-@Composable
-fun CurrentWeatherContent(
-    currentScreen: MainActivityScreen,
-    modifier: Modifier,
-    viewmodel: CurrentWeatherViewModel
-) {
-    val weatherData by viewmodel.weatherData.observeAsState()
-
-    ScrollableColumn(modifier = modifier, children = {
-        Column(modifier = Modifier.padding(24.dp)) {
-            //Currently broken in Compose
-            var textValue by state { TextFieldValue("") }
-            FilledTextField(value = textValue,
-                label = { Text(text = "City, State or Zip") },
-                modifier = Modifier.fillMaxWidth(),
-                // Update value of textValue with the latest value of the text field
-                onFocusChanged = {
-                    textValue = TextFieldValue("")
-                },
-                onValueChange = {
-                    textValue = it
-                },
-                imeAction = ImeAction.Search,
-                onImeActionPerformed = { imeAction, _ ->
-                    if (imeAction == ImeAction.Search) {
-                        viewmodel.getWeatherData(textValue.text)
-                    }
-                }
-            )
-
-            Spacer(modifier = Modifier.preferredHeight(8.dp))
-
-            weatherData?.let {
-                Text(
-                    text = "Current Temperature in ${it.name} ",
-                    style = MaterialTheme.typography.h6
-                )
-                Text(text = "${it.main.temp} °F", style = MaterialTheme.typography.h5)
-            }
-        }
-    })
-
-//    val onPopupDismissed = { viewmodel._newSearch.postValue(false) }
-//
-//    if (startNewSearch!!) {
-//        showSearchDialog(onPopupDismissed, viewModel = viewmodel)
-//    }
-
-}
-
 
 
 @Composable

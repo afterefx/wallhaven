@@ -6,6 +6,9 @@ import com.mcwilliams.letscompose.R
 import com.mcwilliams.letscompose.model.weatherdata.WeatherData
 import com.mcwilliams.letscompose.network.LocationApi
 import com.mcwilliams.letscompose.network.WeatherApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class CurrentWeatherRepository @Inject constructor(
@@ -20,10 +23,16 @@ class CurrentWeatherRepository @Inject constructor(
     )
 
     suspend fun getWeather(search: String): WeatherData {
-        val cityDataByLatLong = locationApi.getLatLongByCity(search)
-        return weatherApi.getLatLongByCity(
-            cityDataByLatLong.results[0].geometry.lat.toString(),
-            cityDataByLatLong.results[0].geometry.lng.toString()
-        )
+        val locations = preferences.getStringSet("locations", mutableSetOf())
+        locations!!.add(search)
+        preferences.edit().putStringSet("locations", locations).apply()
+
+        val zipOrCity = search.intOrString()
+        return if (zipOrCity is Int) {
+            weatherApi.getWeatherDataByZipCode(zipOrCity.toString())
+        } else
+            weatherApi.getWeatherDataByCity((zipOrCity as String))
     }
+
+    fun String.intOrString() = toIntOrNull() ?: this
 }

@@ -1,9 +1,7 @@
-package com.mcwilliams.letscompose
+package com.mcwilliams.letscompose.customcomposables
 
 import android.print.PrintDocumentAdapter
 import android.util.Log
-import android.view.View
-import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.Composable

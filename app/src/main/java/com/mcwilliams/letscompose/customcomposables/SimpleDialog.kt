@@ -12,16 +12,15 @@ import androidx.ui.foundation.ProvideTextStyle
 import androidx.ui.foundation.Text
 import androidx.ui.input.TextFieldValue
 import androidx.ui.layout.*
-import androidx.ui.layout.ColumnScope.gravity
 import androidx.ui.material.*
 import androidx.ui.unit.dp
-import com.mcwilliams.letscompose.LocationViewModel
+import com.mcwilliams.letscompose.ui.current.CurrentWeatherViewModel
 
 @Composable
 fun showSearchDialog(
     onPopupDismissed: () -> Unit,
     contentView: @Composable () -> Unit,
-    viewModel: LocationViewModel
+    viewModel: CurrentWeatherViewModel
 ) {
     val AlertDialogWidth = Modifier.preferredWidth(312.dp)
     val TitlePadding = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 0.dp)

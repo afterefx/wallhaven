@@ -1,4 +1,4 @@
-package com.mcwilliams.letscompose.ui
+package com.mcwilliams.letscompose.theme
 
 import androidx.ui.graphics.Color
 

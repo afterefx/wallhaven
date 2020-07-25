@@ -1,4 +1,4 @@
-package com.mcwilliams.letscompose
+package com.mcwilliams.letscompose.ui
 
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -7,7 +7,6 @@ import androidx.compose.Composable
 import androidx.compose.getValue
 import androidx.compose.setValue
 import androidx.compose.state
-import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
 import androidx.ui.core.setContent
 import androidx.ui.foundation.*
@@ -16,17 +15,19 @@ import androidx.ui.input.TextFieldValue
 import androidx.ui.layout.*
 import androidx.ui.livedata.observeAsState
 import androidx.ui.material.*
-import androidx.ui.material.icons.Icons
-import androidx.ui.material.icons.filled.Search
 import androidx.ui.res.vectorResource
 import androidx.ui.unit.dp
-import com.mcwilliams.letscompose.ui.LetsComposeTheme
+import com.mcwilliams.letscompose.R
+import com.mcwilliams.letscompose.customcomposables.WebComponent
+import com.mcwilliams.letscompose.customcomposables.WebContext
+import com.mcwilliams.letscompose.theme.LetsComposeTheme
+import com.mcwilliams.letscompose.ui.current.CurrentWeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: LocationViewModel by viewModels()
+    private val viewModel: CurrentWeatherViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-fun Container(viewModel: LocationViewModel) {
+fun Container(viewModel: CurrentWeatherViewModel) {
     var currentScreen by state { MainActivityScreen.Current }
     Scaffold(
         topBar = {
@@ -90,7 +91,7 @@ enum class MainActivityScreen {
 fun BodyContent(
     currentScreen: MainActivityScreen,
     modifier: Modifier = Modifier,
-    viewmodel: LocationViewModel
+    viewmodel: CurrentWeatherViewModel
 ) {
     when (currentScreen) {
         MainActivityScreen.Current -> CurrentWeatherContent(currentScreen, modifier, viewmodel)
@@ -117,7 +118,7 @@ fun TopAppBar(currentScreen: MainActivityScreen) {
 fun CurrentWeatherContent(
     currentScreen: MainActivityScreen,
     modifier: Modifier,
-    viewmodel: LocationViewModel
+    viewmodel: CurrentWeatherViewModel
 ) {
     val weatherData by viewmodel.weatherData.observeAsState()
 

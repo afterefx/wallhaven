@@ -1,4 +1,4 @@
-package com.mcwilliams.letscompose
+package com.mcwilliams.letscompose.ui.current
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
@@ -11,7 +11,7 @@ import com.mcwilliams.letscompose.network.LocationApi
 import com.mcwilliams.letscompose.network.WeatherApi
 import kotlinx.coroutines.launch
 
-class LocationViewModel @ViewModelInject constructor(
+class CurrentWeatherViewModel @ViewModelInject constructor(
     private val locationApi: LocationApi,
     private val weatherApi: WeatherApi
 ) : ViewModel() {

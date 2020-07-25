@@ -1,4 +1,4 @@
-package com.mcwilliams.letscompose.ui
+package com.mcwilliams.letscompose.theme
 
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.material.Shapes

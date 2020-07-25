@@ -14,7 +14,7 @@
         android:theme="@style/Theme.LetsCompose">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.LetsCompose.NoActionBar">
             <intent-filter>

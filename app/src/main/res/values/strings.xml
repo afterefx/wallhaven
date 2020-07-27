@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">LetsCompose</string>
-    <string name="preference_file_key">weather_app</string>
+    <string name="app_name">WallHaven</string>
+    <string name="preference_file_key">wallhaven_app</string>
 </resources>

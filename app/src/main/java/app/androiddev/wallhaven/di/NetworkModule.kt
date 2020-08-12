@@ -1,11 +1,14 @@
 package app.androiddev.wallhaven.di
 
+import android.content.Context
+import app.androiddev.wallhaven.R
 import app.androiddev.wallhaven.network.WallHavenApi
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -21,7 +24,8 @@ import javax.inject.Named
 @Suppress("unused")
 object NetworkModule {
 
-    private val MY_API_KEY = "zsUcLWkJn6iVLWLNh6XWVGfaM3paWJ2C"
+//    private val MY_API_KEY = "zsUcLWkJn6iVLWLNh6XWVGfaM3paWJ2C"
+
 
     @Provides
     @Reusable
@@ -48,7 +52,12 @@ object NetworkModule {
     @Provides
     @Reusable
     @JvmStatic
-    internal fun provideOkHttp(): OkHttpClient.Builder {
+    internal fun provideOkHttp(@ApplicationContext context: Context): OkHttpClient.Builder {
+        val sharedPref = context.getSharedPreferences(
+            context.getString(R.string.sharedpref),
+            Context.MODE_PRIVATE
+        )
+        val apikey = sharedPref.getString(context.getString(R.string.API_KEY), "")
         val logging = HttpLoggingInterceptor()
         logging.level = HttpLoggingInterceptor.Level.BODY
 
@@ -57,7 +66,7 @@ object NetworkModule {
         okHttpClient.addInterceptor { chain ->
             val original = chain.request()
             val requestBuilder = original.newBuilder()
-            requestBuilder.url(original.url.toString() + "?apikey=$MY_API_KEY")
+            requestBuilder.url(original.url.toString() + "?apikey=$apikey")
             val request = requestBuilder.build()
             chain.proceed(request)
         }

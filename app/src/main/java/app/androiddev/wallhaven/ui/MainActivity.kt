@@ -1,15 +1,24 @@
 package app.androiddev.wallhaven.ui
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.*
+import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
 import androidx.ui.core.setContent
-import androidx.ui.foundation.Icon
-import androidx.ui.foundation.Text
-import androidx.ui.layout.padding
+import androidx.ui.foundation.*
+import androidx.ui.graphics.Color
+import androidx.ui.input.TextFieldValue
+import androidx.ui.layout.*
 import androidx.ui.material.*
+import androidx.ui.res.stringResource
 import androidx.ui.res.vectorResource
+import androidx.ui.text.font.FontWeight
+import androidx.ui.text.style.TextAlign
+import androidx.ui.unit.dp
+import androidx.ui.unit.sp
 import app.androiddev.wallhaven.R
 import app.androiddev.wallhaven.theme.WallHavenTheme
 import app.androiddev.wallhaven.ui.details.WallPaperDetailsCompose
@@ -27,13 +36,64 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            var showUI by remember { mutableStateOf(false) }
+            val sharedPref =
+                getSharedPreferences(getString(R.string.sharedpref), Context.MODE_PRIVATE)
+
+            showUI = sharedPref.contains(getString(R.string.API_KEY))
             WallHavenTheme {
-                Container(wallpaperDetailsCompose)
+                if (showUI) {
+                    Container(wallpaperDetailsCompose)
+                } else {
+                    ApiUi(sharedPref) {
+                        showUI = it
+                    }
+                }
+
             }
         }
     }
 }
 
+@Composable
+fun ApiUi(
+    sharedPref: SharedPreferences,
+    updateShowUi: (Boolean) -> Unit
+) {
+    Surface(color = Color(0xFF0D4390), modifier = Modifier.fillMaxSize()) {
+
+        Column(modifier = Modifier.padding(16.dp)) {
+            Spacer(modifier = Modifier.height(90.dp))
+            Text("Wallhaven", color = Color.White, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, fontSize = 60.sp)
+            Spacer(modifier = Modifier.height(90.dp))
+            Text(text = "Add your API Key: ", color = Color.White, fontWeight = FontWeight.Bold)
+            val tf = state { TextFieldValue("") }
+            Box(
+                backgroundColor = Color.White,
+                paddingStart = 4.dp,
+                gravity = Alignment.CenterStart
+            ) {
+                TextField(
+                    value = tf.value,
+                    onValueChange = {
+                        tf.value = it
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(2.dp),
+                    cursorColor = Color.Black
+                )
+            }
+
+            val stringResource = stringResource(id = R.string.API_KEY)
+            Button(modifier = Modifier.padding(top = 4.dp), onClick = {
+                sharedPref.edit().putString(stringResource, tf.value.text).apply()
+                updateShowUi(true)
+            }) {
+                Text(text = "Submit")
+            }
+        }
+
+    }
+}
 
 @Composable
 fun Container(wallPaperDetailsCompose: WallPaperDetailsCompose) {

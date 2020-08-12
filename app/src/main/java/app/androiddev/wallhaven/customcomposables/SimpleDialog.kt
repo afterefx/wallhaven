@@ -14,8 +14,7 @@ import androidx.ui.input.TextFieldValue
 import androidx.ui.layout.*
 import androidx.ui.material.*
 import androidx.ui.unit.dp
-import app.androiddev.wallhaven.ui.current.SearchViewModel
-import app.androiddev.wallhaven.ui.current.WallPaperDetailsViewModel
+import app.androiddev.wallhaven.ui.search.SearchViewModel
 
 @Composable
 fun showSearchDialog(

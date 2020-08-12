@@ -1,4 +1,4 @@
-package app.androiddev.wallhaven.ui.current
+package app.androiddev.wallhaven.ui.latest
 
 import androidx.compose.Composable
 import androidx.compose.getValue
@@ -10,13 +10,14 @@ import androidx.ui.layout.*
 import androidx.ui.livedata.observeAsState
 import androidx.ui.unit.dp
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
-import app.androiddev.wallhaven.ui.MainActivityScreen
+import app.androiddev.wallhaven.ui.ScreenState
 import dev.chrisbanes.accompanist.coil.CoilImage
 
 @Composable
 fun LatestContent(
-    currentScreen: MainActivityScreen,
-    viewmodel: LatestWallPapersViewModel
+    viewmodel: LatestWallPapersViewModel,
+    updateScreen: (ScreenState) -> Unit,
+    updateId: (String) -> Unit
 ) {
     val wallpaperSearchResults by viewmodel.latestWallpapers.observeAsState()
 
@@ -30,7 +31,13 @@ fun LatestContent(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     row.forEach { wallpaper ->
-                        ThumbNail(wallpaper, Modifier.clickable(onClick = { TODO(reason = "make it clickable and go to detail page")} ))
+                        ThumbNail(
+                            wallpaper,
+                            Modifier.clickable(onClick = {
+                                updateId(wallpaper.id)
+                                updateScreen(ScreenState.Detail)
+                            })
+                        )
                     }
 
                 }

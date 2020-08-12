@@ -2,7 +2,7 @@ package app.androiddev.wallhaven.di
 
 import android.content.Context
 import app.androiddev.wallhaven.network.WallHavenApi
-import app.androiddev.wallhaven.ui.current.WallHavenRepository
+import app.androiddev.wallhaven.ui.WallHavenRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,9 +16,10 @@ import javax.inject.Singleton
 class AppModule {
     @Provides
     @Singleton
-    fun providesCurrentWeatherRepository(
+    fun providesWallhavenRepository(
         @ApplicationContext context: Context,
         wallHavenApi: WallHavenApi,
     ): WallHavenRepository =
         WallHavenRepository(context, wallHavenApi)
+
 }

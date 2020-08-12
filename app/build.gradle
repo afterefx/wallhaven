@@ -51,12 +51,13 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.5.0-alpha01'
-    implementation 'androidx.appcompat:appcompat:1.3.0-alpha01'
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation "androidx.core:core-ktx:1.5.0-alpha01"
+    implementation "androidx.appcompat:appcompat:1.3.0-alpha01"
+    implementation "com.google.android.material:material:1.1.0"
 
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
 
     implementation "androidx.activity:activity-ktx:1.1.0"
     implementation "androidx.fragment:fragment-ktx:1.2.5"
@@ -66,8 +67,8 @@ dependencies {
     implementation "androidx.ui:ui-tooling:$compose_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
 
-    implementation "com.squareup.retrofit2:retrofit:2.8.1"
-    implementation "com.squareup.retrofit2:converter-gson:2.8.1"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation 'com.squareup.okhttp3:logging-interceptor:4.7.2'
 
     implementation "dev.chrisbanes.accompanist:accompanist-coil:0.1.7"
@@ -78,7 +79,11 @@ dependencies {
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02"
     kapt "androidx.hilt:hilt-compiler:1.0.0-alpha02"
 
-    testImplementation 'junit:junit:4.+'
+    //Assisted inject
+    compileOnly "com.squareup.inject:assisted-inject-annotations-dagger2:0.5.2"
+    annotationProcessor "com.squareup.inject:assisted-inject-processor-dagger2:0.5.2"
+
+    testImplementation "junit:junit:4.13"
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

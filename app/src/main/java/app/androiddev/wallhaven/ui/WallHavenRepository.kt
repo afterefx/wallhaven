@@ -1,4 +1,4 @@
-package app.androiddev.wallhaven.ui.current
+package app.androiddev.wallhaven.ui
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -6,7 +6,6 @@ import app.androiddev.wallhaven.R
 import app.androiddev.wallhaven.model.wallhavendata.*
 import app.androiddev.wallhaven.model.wallhavendata.Collection
 import app.androiddev.wallhaven.network.WallHavenApi
-import retrofit2.http.Query
 import javax.inject.Inject
 
 class WallHavenRepository @Inject constructor(

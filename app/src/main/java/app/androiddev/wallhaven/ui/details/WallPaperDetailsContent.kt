@@ -1,18 +1,18 @@
 package app.androiddev.wallhaven.ui.details
 
 import androidx.compose.*
+import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
+import androidx.ui.foundation.Box
 import androidx.ui.foundation.ScrollableColumn
 import androidx.ui.foundation.Text
-import androidx.ui.input.ImeAction
-import androidx.ui.input.TextFieldValue
 import androidx.ui.layout.*
-import androidx.ui.material.FilledTextField
 import androidx.ui.material.MaterialTheme
 import androidx.ui.text.style.TextAlign
 import androidx.ui.unit.dp
 import androidx.ui.unit.sp
 import androidx.ui.viewmodel.viewModel
+import app.androiddev.wallhaven.extensions.Color
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import dev.chrisbanes.accompanist.coil.CoilImage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,6 +56,9 @@ class WallPaperDetailsCompose @Inject constructor(private val vmAction: DetailAc
         ScrollableColumn(modifier = Modifier.fillMaxSize()) {
             wallpaperDetails.let { data ->
                 Column(modifier = Modifier.fillMaxHeight()) {
+
+                    Spacer(modifier = Modifier.preferredHeight(8.dp))
+
                     CoilImage(
                         data = data.thumbs.small,
                         modifier = Modifier.aspectRatio(data.ratio.toFloat()).fillMaxSize()
@@ -65,24 +68,125 @@ class WallPaperDetailsCompose @Inject constructor(private val vmAction: DetailAc
 
                         Spacer(modifier = Modifier.preferredHeight(8.dp))
 
-                        Text(
-                            text = data.thumbs.small,
-                            style = MaterialTheme.typography.body1
-                        )
-                        Text(
-                            text = data.short_url,
-                            style = MaterialTheme.typography.h2
-                        )
-                        Text(
-                            text = data.url,
-                            style = MaterialTheme.typography.body1,
-                            modifier = Modifier.padding(0.dp, 8.dp)
-                        )
+                        Label(text = "Category: ") {
+                            Text(text = data.category, style = MaterialTheme.typography.body1)
+                        }
 
+                        Label(text = "Colors:") {
+                            ColorTable(data.colors)
+                        }
+
+                        Label("Tags:")
+                        Table(items = data.tags.map { it.name }, maxItemsPerRow = 3) {
+                            Text(text = it)
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
+
+
+                        Label(text = "Uploader: ") {
+                            Text(
+                                text = data.uploader.username,
+                                style = MaterialTheme.typography.body1
+                            )
+                        }
+                        Label(text = "Created: ") {
+                            Text(text = data.created_at, style = MaterialTheme.typography.body1)
+                        }
+                        Label(text = "Purity: ") {
+                            Text(text = data.purity, style = MaterialTheme.typography.body1)
+                        }
+                        Label(text = "Ratio: ") {
+                            Text(text = data.ratio, style = MaterialTheme.typography.body1)
+                        }
+                        Label(text = "Resolution: ") {
+                            Text(text = data.resolution, style = MaterialTheme.typography.body1)
+                        }
+                        Label(text = "Views: ") {
+                            Text(
+                                text = data.views.toString(),
+                                style = MaterialTheme.typography.body1
+                            )
+                        }
+                        Label(text = "Favorites: ") {
+                            Text(
+                                text = data.favorites.toString(),
+                                style = MaterialTheme.typography.body1
+                            )
+                        }
+/*
+                        val created_at: String,
+                        val dimension_x: Int,
+                        val dimension_y: Int,
+                        val favorites: Int,
+                        val file_size: Int,
+                        val file_type: String,
+                        val id: String,
+                        val path: String,
+                        val purity: String,
+                        val ratio: String,
+                        val resolution: String,
+                        val short_url: String,
+                        val source: String,
+                        val tags: List<Tag>,
+                        val thumbs: Thumbs,
+                        val uploader: Uploader,
+                        val url: String,
+                        val views: Int
+*/
                     }
                 }
             }
         }
 
+    }
+
+    @Composable
+    private fun ColorTable(colors: List<String>) {
+        Table(items = colors) {
+            ColorBox(colorString = it)
+        }
+    }
+
+    @Composable
+    private fun Table(
+        items: List<String>,
+        maxItemsPerRow: Int = 4,
+        reducer: @Composable (String) -> Unit,
+    ) {
+        var number = 0
+        while (number < items.size) {
+            Row {
+                var i = 0
+                while (i < maxItemsPerRow) {
+                    if (number + i < items.size)
+                        reducer(items[number + i])
+                    i++
+                }
+                number += maxItemsPerRow
+            }
+        }
+    }
+
+    @Composable
+    private fun ColorBox(colorString: String) {
+        Box(
+            backgroundColor = Color(colorString),
+            modifier = Modifier
+        ) {
+            Text(text = colorString, fontSize = 12.sp)
+        }
+    }
+
+
+    @Composable
+    private fun Label(text: String, value: (@Composable () -> Unit)? = null) {
+        if (value != null) {
+            Row(verticalGravity = Alignment.CenterVertically) {
+                Text(text = text, style = MaterialTheme.typography.h5)
+                value()
+            }
+        } else {
+            Text(text = text, style = MaterialTheme.typography.h5)
+        }
     }
 }

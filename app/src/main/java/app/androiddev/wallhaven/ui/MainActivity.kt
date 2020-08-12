@@ -1,22 +1,20 @@
 package app.androiddev.wallhaven.ui
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.*
 import androidx.ui.core.Modifier
 import androidx.ui.core.setContent
-import androidx.ui.foundation.*
-import androidx.ui.layout.*
+import androidx.ui.foundation.Icon
+import androidx.ui.foundation.Text
+import androidx.ui.layout.padding
 import androidx.ui.material.*
 import androidx.ui.res.vectorResource
 import app.androiddev.wallhaven.R
 import app.androiddev.wallhaven.theme.WallHavenTheme
 import app.androiddev.wallhaven.ui.details.WallPaperDetailsCompose
-import app.androiddev.wallhaven.ui.latest.LatestWallPapersViewModel
 import app.androiddev.wallhaven.ui.latest.LatestContent
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,14 +22,13 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var wallpaperDetailsCompose: WallPaperDetailsCompose
-    private val latestVM: LatestWallPapersViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             WallHavenTheme {
-                Container(wallpaperDetailsCompose, latestVM)
+                Container(wallpaperDetailsCompose)
             }
         }
     }
@@ -39,62 +36,50 @@ class MainActivity : AppCompatActivity() {
 
 
 @Composable
-fun Container(
-    wallPaperDetailsCompose: WallPaperDetailsCompose,
-    latestVM: LatestWallPapersViewModel
-) {
+fun Container(wallPaperDetailsCompose: WallPaperDetailsCompose) {
+
     var activityViewState = MainActivityViewState(ScreenState.Latest)
     var currentScreen by remember { mutableStateOf(activityViewState.currentScreen) }
     var wallpaperId by remember { mutableStateOf("dgrgql") }
 
+    val updateScreen: (ScreenState) -> Unit = { newScreen ->
+        currentScreen = newScreen
+        activityViewState.currentScreen = newScreen
+    }
+    val updateWallpaper: (String) -> Unit = { newId -> wallpaperId = newId }
+
     Scaffold(
         topBar = {
-            TitleContent(currentScreen = activityViewState.currentScreen)
+            TitleContent(currentScreen = currentScreen, updateScreen = updateScreen)
         },
         bodyContent = {
-            BodyContent(
-                currentScreen = currentScreen,
-                updateScreen = { newScreen -> currentScreen = newScreen },
-                detailsCompose = wallPaperDetailsCompose,
-                id = wallpaperId,
-                updateWallpaperId = { newId -> wallpaperId = newId },
-                modifier = Modifier.padding(it),
-                latestWallPapersViewModel = latestVM
-            )
+            when (currentScreen) {
+                ScreenState.Latest -> {
+                    LatestContent(updateScreen, updateWallpaper)
+                }
+                ScreenState.Detail -> {
+                    wallPaperDetailsCompose.WallPaperDetailsContent(
+                        wallpaperId,
+                        Modifier.padding(it)
+                    )
+                }
+                ScreenState.TopList -> TODO()
+                ScreenState.Random -> TODO()
+            }
         },
         bottomBar = {
             when (currentScreen) {
                 ScreenState.Latest -> {
-                    BottomNavigation(
-                        content = {
-                            listOf(
-                                BottomNavigationItem(
-                                    selected = currentScreen == ScreenState.Latest,
-                                    text = { Text(text = "Latest") },
-                                    onSelected = {
-                                        currentScreen = ScreenState.Latest
-                                    },
-                                    icon = { Icon(asset = vectorResource(id = R.drawable.ic_home_white_24dp)) }
-                                ),
-                                BottomNavigationItem(
-                                    selected = currentScreen == ScreenState.Detail,
-                                    text = { Text(text = "Detail") },
-                                    onSelected = {
-                                        currentScreen = ScreenState.Detail
-                                    },
-                                    icon = { Icon(asset = vectorResource(id = R.drawable.ic_favorite_white_24dp)) }
-                                ),
-//                                BottomNavigationItem(
-//                                    selected = currentScreen == MainActivityScreen.Forecast,
-//                                    text = { Text(text = "Forecast") },
-//                                    onSelected = {
-//                                        currentScreen = MainActivityScreen.Forecast
-//                                    },
-//                                    icon = { Icon(asset = vectorResource(id = R.drawable.ic_chat_white_24dp)) }
-//                                ),
-                            )
-                        }
-                    )
+                    BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
+                }
+                ScreenState.TopList -> {
+                    BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
+                }
+                ScreenState.Random -> {
+                    BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
+                }
+                ScreenState.Detail -> {
+                    //no bottom bar
                 }
             }
         }
@@ -102,44 +87,64 @@ fun Container(
     )
 }
 
-
-@ExperimentalCoroutinesApi
 @Composable
-fun BodyContent(
+fun BottomNavigation(currentScreen: ScreenState, updateScreen: (ScreenState) -> Unit) {
+    BottomNavigation(
+        content = {
+            listOf(
+                BottomNavigationItem(
+                    selected = currentScreen == ScreenState.Latest,
+                    text = { Text(text = "Latest") },
+                    onSelected = {
+                        updateScreen(ScreenState.Latest)
+                    },
+                    icon = { Icon(asset = vectorResource(id = R.drawable.ic_home_white_24dp)) }
+                ),
+                BottomNavigationItem(
+                    selected = currentScreen == ScreenState.TopList,
+                    text = { Text(text = "Top List") },
+                    onSelected = {
+                        updateScreen(ScreenState.TopList)
+                    },
+                    icon = { Icon(asset = vectorResource(id = R.drawable.ic_favorite_white_24dp)) }
+                ),
+                BottomNavigationItem(
+                    selected = currentScreen == ScreenState.Random,
+                    text = { Text(text = "Random") },
+                    onSelected = {
+                        updateScreen(ScreenState.Random)
+                    },
+                    icon = { Icon(asset = vectorResource(id = R.drawable.ic_random)) }
+                )
+            )
+        }
+    )
+}
+
+
+@Composable
+fun TitleContent(
     currentScreen: ScreenState,
-    updateScreen: (ScreenState) -> Unit,
-    detailsCompose: WallPaperDetailsCompose,
-    id: String = "dgrgql",
-    updateWallpaperId: (String) -> Unit,
     modifier: Modifier = Modifier,
-    latestWallPapersViewModel: LatestWallPapersViewModel
+    updateScreen: (ScreenState) -> Unit
 ) {
     when (currentScreen) {
-        ScreenState.Latest -> LatestContent(
-            latestWallPapersViewModel,
-            updateScreen,
-            updateWallpaperId
-        )
-        ScreenState.Detail -> {
-            detailsCompose.WallPaperDetailsContent(id, modifier)
-        }
-//        MainActivityScreen.Forecast -> ForecastContent(modifier)
-    }
-}
-
-@Composable
-fun TitleContent(currentScreen: ScreenState, modifier: Modifier = Modifier) {
-    when (currentScreen) {
         ScreenState.Latest -> TopAppBar("Latest")
-        ScreenState.Detail -> TopAppBar("Details")
-//        ScreenState.Forecast -> TopAppBar(currentScreen)
+        ScreenState.Detail -> TopAppBar("Details") {
+            IconButton(onClick = {
+                updateScreen(ScreenState.Latest)
+            }) {
+                Icon(asset = vectorResource(id = R.drawable.ic_arrow_back))
+            }
+        }
     }
 }
 
 @Composable
-fun TopAppBar(title: String) {
+fun TopAppBar(title: String, navigationIcon: @Composable (() -> Unit)? = null) {
     TopAppBar(
-        title = { Text(text = title) }
+        title = { Text(text = title) },
+        navigationIcon = navigationIcon
     )
 }
 

@@ -1,7 +1,7 @@
 package app.androiddev.wallhaven.extensions
 
-import androidx.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
 
 fun Color(colorString: String): Color {
-    return Color(android.graphics.Color.parseColor("$colorString"))
+    return Color(android.graphics.Color.parseColor(colorString))
 }

@@ -4,21 +4,21 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.*
-import androidx.ui.core.Alignment
-import androidx.ui.core.Modifier
-import androidx.ui.core.setContent
-import androidx.ui.foundation.*
-import androidx.ui.graphics.Color
-import androidx.ui.input.TextFieldValue
-import androidx.ui.layout.*
-import androidx.ui.material.*
-import androidx.ui.res.stringResource
-import androidx.ui.res.vectorResource
-import androidx.ui.text.font.FontWeight
-import androidx.ui.text.style.TextAlign
-import androidx.ui.unit.dp
-import androidx.ui.unit.sp
+import androidx.compose.foundation.Icon
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import app.androiddev.wallhaven.R
 import app.androiddev.wallhaven.theme.WallHavenTheme
 import app.androiddev.wallhaven.ui.details.WallPaperDetailsCompose
@@ -64,28 +64,30 @@ fun ApiUi(
 
         Column(modifier = Modifier.padding(16.dp)) {
             Spacer(modifier = Modifier.height(90.dp))
-            Text("Wallhaven", color = Color.White, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, fontSize = 60.sp)
+            Text(
+                "Wallhaven",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                fontSize = 60.sp
+            )
             Spacer(modifier = Modifier.height(90.dp))
-            Text(text = "Add your API Key: ", color = Color.White, fontWeight = FontWeight.Bold)
-            val tf = state { TextFieldValue("") }
-            Box(
+            var tf by remember { mutableStateOf(TextFieldValue("")) }
+
+            TextField(
+                value = tf,
+                onValueChange = { s: TextFieldValue -> tf = s },
+                label = @Composable { Text(text = "API Key") },
+                shape = MaterialTheme.shapes.medium,
                 backgroundColor = Color.White,
-                paddingStart = 4.dp,
-                gravity = Alignment.CenterStart
-            ) {
-                TextField(
-                    value = tf.value,
-                    onValueChange = {
-                        tf.value = it
-                    },
-                    modifier = Modifier.fillMaxWidth().padding(2.dp),
-                    cursorColor = Color.Black
-                )
-            }
+                activeColor = Color.White,
+                inactiveColor = Color.White,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             val stringResource = stringResource(id = R.string.API_KEY)
             Button(modifier = Modifier.padding(top = 4.dp), onClick = {
-                sharedPref.edit().putString(stringResource, tf.value.text).apply()
+                sharedPref.edit().putString(stringResource, tf.text).apply()
                 updateShowUi(true)
             }) {
                 Text(text = "Submit")
@@ -154,24 +156,24 @@ fun BottomNavigation(currentScreen: ScreenState, updateScreen: (ScreenState) -> 
             listOf(
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.Latest,
-                    text = { Text(text = "Latest") },
-                    onSelected = {
+                    label = { Text(text = "Latest") },
+                    onSelect = {
                         updateScreen(ScreenState.Latest)
                     },
                     icon = { Icon(asset = vectorResource(id = R.drawable.ic_home_white_24dp)) }
                 ),
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.TopList,
-                    text = { Text(text = "Top List") },
-                    onSelected = {
+                    label = { Text(text = "Top List") },
+                    onSelect = {
                         updateScreen(ScreenState.TopList)
                     },
                     icon = { Icon(asset = vectorResource(id = R.drawable.ic_favorite_white_24dp)) }
                 ),
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.Random,
-                    text = { Text(text = "Random") },
-                    onSelected = {
+                    label = { Text(text = "Random") },
+                    onSelect = {
                         updateScreen(ScreenState.Random)
                     },
                     icon = { Icon(asset = vectorResource(id = R.drawable.ic_random)) }

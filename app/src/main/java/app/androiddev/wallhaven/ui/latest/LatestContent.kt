@@ -1,15 +1,15 @@
 package app.androiddev.wallhaven.ui.latest
 
-import androidx.compose.Composable
-import androidx.compose.getValue
-import androidx.ui.core.Modifier
-import androidx.ui.foundation.ScrollableColumn
-import androidx.ui.foundation.Text
-import androidx.ui.foundation.clickable
-import androidx.ui.layout.*
-import androidx.ui.livedata.observeAsState
-import androidx.ui.unit.dp
-import androidx.ui.viewmodel.viewModel
+import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.viewModel
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.ScreenState
 import dev.chrisbanes.accompanist.coil.CoilImage

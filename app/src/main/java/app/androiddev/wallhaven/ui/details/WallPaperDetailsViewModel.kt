@@ -1,15 +1,9 @@
 package app.androiddev.wallhaven.ui.details
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
-import app.androiddev.wallhaven.ui.WallHavenRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi

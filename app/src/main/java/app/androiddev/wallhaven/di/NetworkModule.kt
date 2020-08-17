@@ -15,7 +15,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
 
-
 /**
  * Module which provides all required dependencies about network
  */
@@ -25,7 +24,6 @@ import javax.inject.Named
 object NetworkModule {
 
 //    private val MY_API_KEY = "zsUcLWkJn6iVLWLNh6XWVGfaM3paWJ2C"
-
 
     @Provides
     @Reusable
@@ -47,7 +45,6 @@ object NetworkModule {
             .client(okHttpClient.build())
             .build()
     }
-
 
     @Provides
     @Reusable

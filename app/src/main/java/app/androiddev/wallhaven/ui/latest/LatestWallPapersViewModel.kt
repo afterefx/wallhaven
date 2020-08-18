@@ -13,8 +13,9 @@ class LatestWallPapersViewModel @ViewModelInject constructor(
     private val wallHavenRepository: WallHavenRepository
 ) : ViewModel() {
 
-    val _latestWallpapers = MutableLiveData<SearchResults>()
-    val latestWallpapers: LiveData<SearchResults> = _latestWallpapers
+    private val _latestWallpapers = MutableLiveData<SearchResults>()
+    val latestWallpapers: LiveData<SearchResults>
+        get() = _latestWallpapers
 
     init {
         getLatestWallpapers()
@@ -28,7 +29,6 @@ class LatestWallPapersViewModel @ViewModelInject constructor(
             )
         }
     }
-
 
 
 }

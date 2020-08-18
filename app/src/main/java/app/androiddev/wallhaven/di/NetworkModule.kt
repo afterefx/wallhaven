@@ -9,6 +9,9 @@ import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import okhttp3.Cookie
+import okhttp3.CookieJar
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -23,20 +26,19 @@ import javax.inject.Named
 @Suppress("unused")
 object NetworkModule {
 
-//    private val MY_API_KEY = "zsUcLWkJn6iVLWLNh6XWVGfaM3paWJ2C"
-
     @Provides
     @Reusable
     @JvmStatic
-    internal fun provideWallHavenApi(retrofit: Retrofit): WallHavenApi {
+    internal fun provideWallHavenApi(@Named("api") retrofit: Retrofit): WallHavenApi {
         return retrofit.create(WallHavenApi::class.java)
     }
 
     @Provides
     @Reusable
     @JvmStatic
+    @Named("api")
     internal fun provideWallHavenClientApi(
-        okHttpClient: OkHttpClient.Builder
+        @Named("apikey") okHttpClient: OkHttpClient.Builder
     ): Retrofit {
 
         return Retrofit.Builder()
@@ -49,6 +51,7 @@ object NetworkModule {
     @Provides
     @Reusable
     @JvmStatic
+    @Named("apikey")
     internal fun provideOkHttp(@ApplicationContext context: Context): OkHttpClient.Builder {
         val sharedPref = context.getSharedPreferences(
             context.getString(R.string.sharedpref),
@@ -69,4 +72,33 @@ object NetworkModule {
         }
         return okHttpClient
     }
+}
+
+@InstallIn(ApplicationComponent::class)
+@Module
+@Suppress("unused")
+object LoginModule {
+
+    @Provides
+    @Reusable
+    @JvmStatic
+    @Named("cookie")
+    internal fun provideOkHttp(): OkHttpClient.Builder {
+        val logging = HttpLoggingInterceptor()
+        logging.level = HttpLoggingInterceptor.Level.BODY
+
+        val okHttpClient = OkHttpClient.Builder()
+        okHttpClient.addInterceptor(logging)
+        okHttpClient.cookieJar(object : CookieJar {
+            val cookieStore: MutableList<Cookie> = mutableListOf()
+
+            override fun loadForRequest(url: HttpUrl): List<Cookie> = cookieStore
+
+            override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
+                cookieStore.addAll(cookies)
+            }
+        })
+        return okHttpClient
+    }
+
 }

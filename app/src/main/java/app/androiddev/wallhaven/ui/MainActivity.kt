@@ -15,10 +15,12 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.viewModel
 import app.androiddev.wallhaven.R
 import app.androiddev.wallhaven.theme.WallHavenTheme
 import app.androiddev.wallhaven.ui.details.WallPaperDetailsCompose
@@ -45,7 +47,7 @@ class MainActivity : AppCompatActivity() {
                 if (showUI) {
                     Container(wallpaperDetailsCompose)
                 } else {
-                    ApiUi(sharedPref) {
+                    LoginUi(sharedPref) {
                         showUI = it
                     }
                 }
@@ -56,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-fun ApiUi(
+fun LoginUi(
     sharedPref: SharedPreferences,
     updateShowUi: (Boolean) -> Unit
 ) {
@@ -72,12 +74,13 @@ fun ApiUi(
                 fontSize = 60.sp
             )
             Spacer(modifier = Modifier.height(90.dp))
-            var tf by remember { mutableStateOf(TextFieldValue("")) }
+            var username by remember { mutableStateOf(TextFieldValue("")) }
+            var password by remember { mutableStateOf(TextFieldValue("")) }
 
             TextField(
-                value = tf,
-                onValueChange = { s: TextFieldValue -> tf = s },
-                label = @Composable { Text(text = "API Key") },
+                value = username,
+                onValueChange = { s: TextFieldValue -> username = s },
+                label = @Composable { Text(text = "Username") },
                 shape = MaterialTheme.shapes.medium,
                 backgroundColor = Color.White,
                 activeColor = Color.White,
@@ -85,11 +88,28 @@ fun ApiUi(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            TextField(
+                value = password,
+                onValueChange = { s: TextFieldValue -> password = s },
+                label = @Composable { Text(text = "Password") },
+                shape = MaterialTheme.shapes.medium,
+                visualTransformation = PasswordVisualTransformation(),
+                backgroundColor = Color.White,
+                activeColor = Color.White,
+                inactiveColor = Color.White,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            val vm : LoginViewModel = viewModel()
             val stringResource = stringResource(id = R.string.API_KEY)
-            Button(modifier = Modifier.padding(top = 4.dp), onClick = {
-                sharedPref.edit().putString(stringResource, tf.text).apply()
-                updateShowUi(true)
-            }) {
+            val onSubmit = {
+                vm.doLogin(username.text, password.text) {
+                    sharedPref.edit().putString(stringResource, it).apply()
+                    updateShowUi(true)
+                }
+            }
+
+            Button(modifier = Modifier.padding(top = 4.dp), onClick = onSubmit) {
                 Text(text = "Submit")
             }
         }

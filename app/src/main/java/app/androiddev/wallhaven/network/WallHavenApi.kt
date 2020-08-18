@@ -2,9 +2,8 @@ package app.androiddev.wallhaven.network
 
 import app.androiddev.wallhaven.model.wallhavendata.*
 import app.androiddev.wallhaven.model.wallhavendata.Collection
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import app.androiddev.wallhaven.model.wallhavendata.Tag
+import retrofit2.http.*
 
 interface WallHavenApi {
     @GET("w/{id}")

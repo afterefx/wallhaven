@@ -1,15 +1,13 @@
 package app.androiddev.wallhaven.ui.details
 
-import javax.inject.Inject
-
-sealed class MVOperation {
-    object GetWallpaper : MVOperation()
+sealed class DetailMVOperation {
+    object GetWallpaper : DetailMVOperation()
 }
 
-class DetailAction @Inject constructor() {
-    fun action(op: MVOperation, detailsViewModel: WallPaperDetailsViewModel, id: String = "") {
+class DetailAction() {
+    fun action(op: DetailMVOperation, detailsViewModel: WallPaperDetailsViewModel, id: String = "") {
         when (op) {
-            MVOperation.GetWallpaper -> detailsViewModel.userIntentChannel.offer( UserIntent.GetWallpaper( id ) )
+            DetailMVOperation.GetWallpaper -> detailsViewModel.userIntentChannel.offer( DetailsUserIntent.GetWallpaper( id ) )
         }
     }
 }

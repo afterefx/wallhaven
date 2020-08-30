@@ -1,53 +1,46 @@
-package app.androiddev.wallhaven.ui.latest
+package app.androiddev.wallhaven.ui.toplist
 
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope.gravity
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.viewModel
 import app.androiddev.wallhaven.ui.Gallery
 import app.androiddev.wallhaven.ui.LoadingScreen
 import app.androiddev.wallhaven.ui.PageButtons
 import app.androiddev.wallhaven.ui.ScreenState
+import app.androiddev.wallhaven.ui.latest.LatestContentAction
+import app.androiddev.wallhaven.ui.latest.MVOperation
 
 @Composable
-fun LatestContent(
+fun TopList(
     updateScreen: (ScreenState) -> Unit,
     updateId: (String) -> Unit
 ) {
-    val viewmodel: LatestWallPapersViewModel = viewModel()
+    val viewmodel: TopListViewModel = viewModel()
     val state by viewmodel.state.collectAsState()
-    val vmAction = LatestContentAction()
+    val vmAction = TopListAction()
 
     if (state.loading) {
-        vmAction.action(op = MVOperation.GetGalleryPage, latestViewModel = viewmodel, page = 1)
+        vmAction.action(op = TopListOperation.GetGalleryPage, viewModel = viewmodel, page = 1)
         LoadingScreen()
     } else {
         ScrollableColumn {
             val prev = {
                 vmAction.action(
-                    MVOperation.GetGalleryPage,
-                    latestViewModel = viewmodel,
+                    TopListOperation.GetGalleryPage,
+                    viewModel = viewmodel,
                     page = (state.page - 1)
                 )
             }
             val next = {
                 vmAction.action(
-                    MVOperation.GetGalleryPage,
-                    latestViewModel = viewmodel,
+                    TopListOperation.GetGalleryPage,
+                    viewModel = viewmodel,
                     page = (state.page + 1)
                 )
             }
@@ -60,5 +53,4 @@ fun LatestContent(
         }
     }
 }
-
 

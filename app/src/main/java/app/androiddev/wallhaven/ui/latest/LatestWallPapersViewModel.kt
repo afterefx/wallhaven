@@ -10,26 +10,16 @@ import app.androiddev.wallhaven.ui.WallHavenRepository
 import kotlinx.coroutines.launch
 
 class LatestWallPapersViewModel @ViewModelInject constructor(
-    private val wallHavenRepository: WallHavenRepository
+    private val latestStateChannel: LatestStateChannel
 ) : ViewModel() {
 
-    private val _latestWallpapers = MutableLiveData<SearchResults>()
-    val latestWallpapers: LiveData<SearchResults>
-        get() = _latestWallpapers
+    val state = latestStateChannel.state
+    val userIntentChannel = latestStateChannel.userIntentChannel
 
     init {
-        getLatestWallpapers()
-    }
-
-
-    fun getLatestWallpapers() {
         viewModelScope.launch {
-            _latestWallpapers.postValue(
-                wallHavenRepository.getLatest()
-            )
+            latestStateChannel.handleIntents()
         }
     }
-
-
 }
 

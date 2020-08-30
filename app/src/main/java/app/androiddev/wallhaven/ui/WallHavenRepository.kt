@@ -34,8 +34,12 @@ class WallHavenRepository @Inject constructor(
         return wallHavenApi.getCollections().data
     }
 
-    suspend fun getLatest(): SearchResults {
-        return search()
+    suspend fun getLatest(page: Int = 1): SearchResults {
+        return search(SearchQuery(page = page))
+    }
+
+    suspend fun getTopList(page: Int = 1): SearchResults {
+        return search(SearchQuery(page = page, sorting = Sort.Toplist))
     }
 
     suspend fun search(query: SearchQuery = SearchQuery()): SearchResults {

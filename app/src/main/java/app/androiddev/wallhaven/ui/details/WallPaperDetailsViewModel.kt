@@ -8,16 +8,16 @@ import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 class WallPaperDetailsViewModel @ViewModelInject  constructor(
-    private val stateChannel: StateChannel,
+    private val detailsStateChannel: DetailsStateChannel,
 ) : ViewModel() {
 
-    val state = stateChannel.state
-    val userIntentChannel = stateChannel.userIntentChannel
+    val state = detailsStateChannel.state
+    val userIntentChannel = detailsStateChannel.userIntentChannel
 
     init {
 //        getWallpaperDetails("dgrgql")
         viewModelScope.launch {
-            stateChannel.handleIntents()
+            detailsStateChannel.handleIntents()
         }
     }
 

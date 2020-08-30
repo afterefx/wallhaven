@@ -16,105 +16,104 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.viewModel
 import app.androiddev.wallhaven.extensions.Color
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
+import app.androiddev.wallhaven.ui.ScreenState
 import dev.chrisbanes.accompanist.coil.CoilImage
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-class WallPaperDetailsCompose @Inject constructor(private val vmAction: DetailAction) {
+@Composable
+fun WallPaperDetailsContent(
+    id: String,
+    updateScreen: (ScreenState) -> Unit,
+    modifier: Modifier = Modifier
+) {
 
-    @Composable
-    fun WallPaperDetailsContent(
-        id: String,
-        modifier: Modifier = Modifier
-    ) {
-        val viewmodel: WallPaperDetailsViewModel = viewModel()
-        val viewState: WallpaperDetailsViewState by viewmodel.state.collectAsState()
+    val viewmodel: WallPaperDetailsViewModel = viewModel()
+    val viewState: WallpaperDetailsViewState by viewmodel.state.collectAsState()
+    val vmAction = DetailAction()
 
-        vmAction.action(op = MVOperation.GetWallpaper, detailsViewModel = viewmodel, id = id)
+    vmAction.action(op = DetailMVOperation.GetWallpaper, detailsViewModel = viewmodel, id = id)
 
-        if (viewState.loading) {
-            loadingScreen()
-        } else {
-            val wallpaperDetails = viewState.wallpaperDetails
-            wallpaperDetails?.let {
-                imageDetail(it)
-            }
+    if (viewState.loading) {
+        loadingScreen()
+    } else {
+        val wallpaperDetails = viewState.wallpaperDetails
+        wallpaperDetails?.let {
+            imageDetail(it)
         }
     }
+}
 
-    @Composable
-    fun loadingScreen() {
-        Text(
-            text = "LOADING DATA",
-            modifier = Modifier.fillMaxSize(),
-            textAlign = TextAlign.Center,
-            fontSize = 40.sp
-        )
-    }
+@Composable
+fun loadingScreen() {
+    Text(
+        text = "LOADING DATA",
+        modifier = Modifier.fillMaxSize(),
+        textAlign = TextAlign.Center,
+        fontSize = 40.sp
+    )
+}
 
-    @Composable
-    fun imageDetail(wallpaperDetails: WallpaperDetails) {
-        ScrollableColumn(modifier = Modifier.fillMaxSize()) {
-            wallpaperDetails.let { data ->
-                Column(modifier = Modifier.fillMaxHeight()) {
+@Composable
+fun imageDetail(wallpaperDetails: WallpaperDetails) {
+    ScrollableColumn(modifier = Modifier.fillMaxSize()) {
+        wallpaperDetails.let { data ->
+            Column(modifier = Modifier.fillMaxHeight()) {
+
+                Spacer(modifier = Modifier.preferredHeight(8.dp))
+
+                CoilImage(
+                    data = data.thumbs.small,
+                    modifier = Modifier.aspectRatio(data.ratio.toFloat()).fillMaxSize()
+                )
+
+                Column(modifier = Modifier.padding(24.dp)) {
 
                     Spacer(modifier = Modifier.preferredHeight(8.dp))
 
-                    CoilImage(
-                        data = data.thumbs.small,
-                        modifier = Modifier.aspectRatio(data.ratio.toFloat()).fillMaxSize()
-                    )
+                    Label(text = "Category: ") {
+                        Text(text = data.category, style = MaterialTheme.typography.body1)
+                    }
 
-                    Column(modifier = Modifier.padding(24.dp)) {
+                    Label(text = "Colors:") {
+                        ColorTable(data.colors)
+                    }
 
-                        Spacer(modifier = Modifier.preferredHeight(8.dp))
-
-                        Label(text = "Category: ") {
-                            Text(text = data.category, style = MaterialTheme.typography.body1)
-                        }
-
-                        Label(text = "Colors:") {
-                            ColorTable(data.colors)
-                        }
-
-                        Label("Tags:")
-                        Table(items = data.tags.map { it.name }, maxItemsPerRow = 3) {
-                            Text(text = it)
-                            Spacer(modifier = Modifier.width(4.dp))
-                        }
+                    Label("Tags:")
+                    Table(items = data.tags.map { it.name }, maxItemsPerRow = 3) {
+                        Text(text = it)
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
 
 
-                        Label(text = "Uploader: ") {
-                            Text(
-                                text = data.uploader.username,
-                                style = MaterialTheme.typography.body1
-                            )
-                        }
-                        Label(text = "Created: ") {
-                            Text(text = data.created_at, style = MaterialTheme.typography.body1)
-                        }
-                        Label(text = "Purity: ") {
-                            Text(text = data.purity, style = MaterialTheme.typography.body1)
-                        }
-                        Label(text = "Ratio: ") {
-                            Text(text = data.ratio, style = MaterialTheme.typography.body1)
-                        }
-                        Label(text = "Resolution: ") {
-                            Text(text = data.resolution, style = MaterialTheme.typography.body1)
-                        }
-                        Label(text = "Views: ") {
-                            Text(
-                                text = data.views.toString(),
-                                style = MaterialTheme.typography.body1
-                            )
-                        }
-                        Label(text = "Favorites: ") {
-                            Text(
-                                text = data.favorites.toString(),
-                                style = MaterialTheme.typography.body1
-                            )
-                        }
+                    Label(text = "Uploader: ") {
+                        Text(
+                            text = data.uploader.username,
+                            style = MaterialTheme.typography.body1
+                        )
+                    }
+                    Label(text = "Created: ") {
+                        Text(text = data.created_at, style = MaterialTheme.typography.body1)
+                    }
+                    Label(text = "Purity: ") {
+                        Text(text = data.purity, style = MaterialTheme.typography.body1)
+                    }
+                    Label(text = "Ratio: ") {
+                        Text(text = data.ratio, style = MaterialTheme.typography.body1)
+                    }
+                    Label(text = "Resolution: ") {
+                        Text(text = data.resolution, style = MaterialTheme.typography.body1)
+                    }
+                    Label(text = "Views: ") {
+                        Text(
+                            text = data.views.toString(),
+                            style = MaterialTheme.typography.body1
+                        )
+                    }
+                    Label(text = "Favorites: ") {
+                        Text(
+                            text = data.favorites.toString(),
+                            style = MaterialTheme.typography.body1
+                        )
+                    }
 /*
                         val created_at: String,
                         val dimension_x: Int,
@@ -135,60 +134,59 @@ class WallPaperDetailsCompose @Inject constructor(private val vmAction: DetailAc
                         val url: String,
                         val views: Int
 */
-                    }
                 }
             }
         }
-
     }
 
-    @Composable
-    private fun ColorTable(colors: List<String>) {
-        Table(items = colors) {
-            ColorBox(colorString = it)
+}
+
+@Composable
+private fun ColorTable(colors: List<String>) {
+    Table(items = colors) {
+        ColorBox(colorString = it)
+    }
+}
+
+@Composable
+private fun Table(
+    items: List<String>,
+    maxItemsPerRow: Int = 4,
+    reducer: @Composable (String) -> Unit,
+) {
+    var number = 0
+    while (number < items.size) {
+        Row {
+            var i = 0
+            while (i < maxItemsPerRow) {
+                if (number + i < items.size)
+                    reducer(items[number + i])
+                i++
+            }
+            number += maxItemsPerRow
         }
     }
+}
 
-    @Composable
-    private fun Table(
-        items: List<String>,
-        maxItemsPerRow: Int = 4,
-        reducer: @Composable (String) -> Unit,
+@Composable
+private fun ColorBox(colorString: String) {
+    Box(
+        backgroundColor = Color(colorString),
+        modifier = Modifier
     ) {
-        var number = 0
-        while (number < items.size) {
-            Row {
-                var i = 0
-                while (i < maxItemsPerRow) {
-                    if (number + i < items.size)
-                        reducer(items[number + i])
-                    i++
-                }
-                number += maxItemsPerRow
-            }
-        }
+        Text(text = colorString, fontSize = 12.sp)
     }
-
-    @Composable
-    private fun ColorBox(colorString: String) {
-        Box(
-            backgroundColor = Color(colorString),
-            modifier = Modifier
-        ) {
-            Text(text = colorString, fontSize = 12.sp)
-        }
-    }
+}
 
 
-    @Composable
-    private fun Label(text: String, value: (@Composable () -> Unit)? = null) {
-        if (value != null) {
-            Row(verticalGravity = Alignment.CenterVertically) {
-                Text(text = text, style = MaterialTheme.typography.h5)
-                value()
-            }
-        } else {
+@Composable
+private fun Label(text: String, value: (@Composable () -> Unit)? = null) {
+    if (value != null) {
+        Row(verticalGravity = Alignment.CenterVertically) {
             Text(text = text, style = MaterialTheme.typography.h5)
+            value()
         }
+    } else {
+        Text(text = text, style = MaterialTheme.typography.h5)
     }
 }

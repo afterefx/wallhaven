@@ -64,7 +64,7 @@ fun LoginUi(
     sharedPref: SharedPreferences,
     updateShowUi: (Boolean) -> Unit
 ) {
-    Surface(color = Color(0xFF0D4390), modifier = Modifier.fillMaxSize()) {
+    Surface(color = Color("#0D4390"), modifier = Modifier.fillMaxSize()) {
 
         Column(modifier = Modifier.padding(16.dp)) {
             Spacer(modifier = Modifier.height(90.dp))
@@ -102,7 +102,7 @@ fun LoginUi(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            val vm : LoginViewModel = viewModel()
+            val vm: LoginViewModel = viewModel()
             val stringResource = stringResource(id = R.string.API_KEY)
             val onSubmit = {
                 vm.doLogin(username.text, password.text) {
@@ -118,6 +118,7 @@ fun LoginUi(
 
     }
 }
+
 
 @Composable
 fun Container(wallPaperDetailsCompose: WallPaperDetailsCompose) {

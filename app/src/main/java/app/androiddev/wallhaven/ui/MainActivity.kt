@@ -22,10 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.viewModel
 import app.androiddev.wallhaven.R
-import app.androiddev.wallhaven.theme.WallHavenTheme
+import app.androiddev.wallhaven.extensions.Color
+import app.androiddev.wallhaven.theme.ColorState
+import app.androiddev.wallhaven.theme.DarkColorPalette
+import app.androiddev.wallhaven.theme.DynamicTheme
 import app.androiddev.wallhaven.ui.details.WallPaperDetailsCompose
 import app.androiddev.wallhaven.ui.latest.LatestContent
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -43,15 +48,12 @@ class MainActivity : AppCompatActivity() {
                 getSharedPreferences(getString(R.string.sharedpref), Context.MODE_PRIVATE)
 
             showUI = sharedPref.contains(getString(R.string.API_KEY))
-            WallHavenTheme {
-                if (showUI) {
-                    Container(wallpaperDetailsCompose)
-                } else {
-                    LoginUi(sharedPref) {
-                        showUI = it
-                    }
+            if (showUI) {
+                Container(wallpaperDetailsCompose)
+            } else {
+                LoginUi(sharedPref) {
+                    showUI = it
                 }
-
             }
         }
     }
@@ -130,43 +132,52 @@ fun Container(wallPaperDetailsCompose: WallPaperDetailsCompose) {
     }
     val updateWallpaper: (String) -> Unit = { newId -> wallpaperId = newId }
 
-    Scaffold(
-        topBar = {
-            TitleContent(currentScreen = currentScreen, updateScreen = updateScreen)
-        },
-        bodyContent = {
-            when (currentScreen) {
-                ScreenState.Latest -> {
-                    LatestContent(updateScreen, updateWallpaper)
-                }
-                ScreenState.Detail -> {
-                    wallPaperDetailsCompose.WallPaperDetailsContent(
-                        wallpaperId,
-                        Modifier.padding(it)
-                    )
-                }
-                ScreenState.TopList -> TODO()
-                ScreenState.Random -> TODO()
-            }
-        },
-        bottomBar = {
-            when (currentScreen) {
-                ScreenState.Latest -> {
-                    BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
-                }
-                ScreenState.TopList -> {
-                    BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
-                }
-                ScreenState.Random -> {
-                    BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
-                }
-                ScreenState.Detail -> {
-                    //no bottom bar
-                }
-            }
-        }
+    val colors = remember { ColorState(DarkColorPalette.primary, DarkColorPalette.onPrimary) }
 
-    )
+    DynamicTheme(colors = colors) {
+        val scope = rememberCoroutineScope()
+        scope.launch(Dispatchers.IO) {
+            Thread.sleep(3000)
+            colors.updateColors(Color.Red, Color.Blue)
+        }
+        Scaffold(
+            topBar = {
+                TitleContent(currentScreen = currentScreen, updateScreen = updateScreen)
+            },
+            bodyContent = {
+                when (currentScreen) {
+                    ScreenState.Latest -> {
+                        LatestContent(updateScreen, updateWallpaper)
+                    }
+                    ScreenState.Detail -> {
+                        wallPaperDetailsCompose.WallPaperDetailsContent(
+                            wallpaperId,
+                            Modifier.padding(it)
+                        )
+                    }
+                    ScreenState.TopList -> TODO()
+                    ScreenState.Random -> TODO()
+                }
+            },
+            bottomBar = {
+                when (currentScreen) {
+                    ScreenState.Latest -> {
+                        BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
+                    }
+                    ScreenState.TopList -> {
+                        BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
+                    }
+                    ScreenState.Random -> {
+                        BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
+                    }
+                    ScreenState.Detail -> {
+                        //no bottom bar
+                    }
+                }
+            }
+
+        )
+    }
 }
 
 @Composable

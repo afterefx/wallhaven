@@ -42,6 +42,9 @@ dependencies {
     // Coil/Accompanist
     implementation("dev.chrisbanes.accompanist:accompanist-coil:0.2.0")
 
+    // Palette
+    implementation("androidx.palette:palette:1.0.0")
+
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.28.3-alpha")
     kapt("com.google.dagger:hilt-android-compiler:2.28.3-alpha")

@@ -6,8 +6,8 @@ plugins {
     kotlin("android.extensions")
 }
 
-val composeVersion = "0.1.0-dev16"
-val kotlinVersion = "1.4.0-rc"
+val composeVersion = "1.0.0-alpha01"
+val kotlinVersion = "1.4.0"
 val retrofitVersion = "2.9.0"
 val lifecycleVersion = "2.2.0"
 
@@ -39,7 +39,8 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
     implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
 
-    implementation("dev.chrisbanes.accompanist:accompanist-coil:0.1.8")
+    // Coil/Accompanist
+    implementation("dev.chrisbanes.accompanist:accompanist-coil:0.2.0")
 
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.28.3-alpha")
@@ -86,7 +87,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerVersion = "1.4.0-rc"
+        kotlinCompilerVersion = "1.4.0"
         kotlinCompilerExtensionVersion = "$composeVersion"
     }
 }
@@ -96,8 +97,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
         freeCompilerArgs = listOf(
             "-Xallow-jvm-ir-dependencies",
-            "-Xskip-prerelease-check",
-            "-Xskip-metadata-version-check"
+            "-Xskip-prerelease-check"
         )
     }
 }

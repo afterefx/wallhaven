@@ -35,6 +35,8 @@ dependencies {
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.ui:ui-tooling:$composeVersion")
 
+    implementation( "androidx.paging:paging-runtime:3.0.0-alpha05")
+
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
     implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")

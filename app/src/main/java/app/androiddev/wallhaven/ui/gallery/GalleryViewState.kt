@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 data class GalleryViewState(
+    val initialized: Boolean = false,
     val loading: Boolean = true,
     val list: List<List<WallpaperDetails>>? = null,
     val page: Int = 1
@@ -17,6 +18,7 @@ sealed class GalleryUserIntent {
     data class GetTopListPage(val page: Int) : GalleryUserIntent()
     data class GetLatestPage(val page: Int) : GalleryUserIntent()
     data class GetRandomPage(val page: Int) : GalleryUserIntent()
+    object Loading : GalleryUserIntent()
 }
 
 /**
@@ -30,11 +32,11 @@ class GalleryStateChannel @Inject constructor(private val repository: WallHavenR
 
     override suspend fun reducer(
         userIntent: GalleryUserIntent,
-        currentState: GalleryViewState,
     ): GalleryViewState {
         when (userIntent) {
             is GalleryUserIntent.GetLatestPage -> {
                 return _state.value.copy(
+                    initialized = true,
                     loading = false,
                     list = gridWallPapers(repository.getLatest(userIntent.page).data),
                     page = userIntent.page
@@ -42,6 +44,7 @@ class GalleryStateChannel @Inject constructor(private val repository: WallHavenR
             }
             is GalleryUserIntent.GetTopListPage -> {
                 return _state.value.copy(
+                    initialized = true,
                     loading = false,
                     list = gridWallPapers(repository.getTopList(userIntent.page).data),
                     page = userIntent.page
@@ -49,9 +52,17 @@ class GalleryStateChannel @Inject constructor(private val repository: WallHavenR
             }
             is GalleryUserIntent.GetRandomPage -> {
                 return _state.value.copy(
+                    initialized = true,
                     loading = false,
                     list = gridWallPapers(repository.getRandom().data),
                     page = userIntent.page
+                )
+            }
+            GalleryUserIntent.Loading -> {
+                return _state.value.copy(
+                    initialized = true,
+                    loading = true,
+                    list = null
                 )
             }
         }

@@ -4,6 +4,7 @@ sealed class GalleryOperation {
     object GetLatestPage : GalleryOperation()
     object GetTopListPage : GalleryOperation()
     object GetRandomListPage : GalleryOperation()
+    object Loading : GalleryOperation()
 }
 
 class GalleryAction {
@@ -21,6 +22,9 @@ class GalleryAction {
             )
             GalleryOperation.GetRandomListPage -> vm.userIntentChannel.offer(
                 GalleryUserIntent.GetRandomPage(page)
+            )
+            GalleryOperation.Loading -> vm.userIntentChannel.offer(
+                GalleryUserIntent.Loading
             )
         }
     }

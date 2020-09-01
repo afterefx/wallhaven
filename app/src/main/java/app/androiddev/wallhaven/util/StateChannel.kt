@@ -35,13 +35,10 @@ abstract class StateChannel<T, U>(
             // create a new viewState and set that to the value in the channel
             // Render of the MVI
             //TODO: add LCE<Result>(Loading/Content/Error)
-            _state.value = reducer(userIntent, state.value)
+            _state.value = reducer(userIntent)
         }
     }
 
-    abstract suspend fun reducer(
-        userIntent: U,
-        currentState: T
-    ): T
+    abstract suspend fun reducer(userIntent: U): T
 }
 

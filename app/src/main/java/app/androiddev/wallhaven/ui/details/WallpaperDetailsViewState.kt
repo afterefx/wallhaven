@@ -29,7 +29,6 @@ class DetailsStateChannel @Inject constructor(
 
     override suspend fun reducer(
         userIntent: DetailsUserIntent,
-        currentState: WallpaperDetailsViewState
     ): WallpaperDetailsViewState {
         when (userIntent) {
             is DetailsUserIntent.GetWallpaper -> {

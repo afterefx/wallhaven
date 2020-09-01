@@ -2,15 +2,14 @@ package app.androiddev.wallhaven.ui.details
 
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.WallHavenRepository
+import app.androiddev.wallhaven.util.StateChannel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.consumeAsFlow
 import javax.inject.Inject
 
-data class WallpaperDetailsViewState(val loading: Boolean = true, val wallpaperDetails: WallpaperDetails? = null)
+data class WallpaperDetailsViewState(
+    val loading: Boolean = true,
+    val wallpaperDetails: WallpaperDetails? = null
+)
 
 /**
  * When the user interacts with the View, instances of Events are generated and
@@ -26,33 +25,20 @@ sealed class DetailsUserIntent {
 @ExperimentalCoroutinesApi
 class DetailsStateChannel @Inject constructor(
     private val repository: WallHavenRepository
-) {
+) : StateChannel<WallpaperDetailsViewState, DetailsUserIntent>(WallpaperDetailsViewState()) {
 
-    // basic Channel<T> to listen to intents and state changes in the ViewModel
-    val userIntentChannel = Channel<DetailsUserIntent>()
-    private val _state = MutableStateFlow(WallpaperDetailsViewState())
-
-    val state: StateFlow<WallpaperDetailsViewState>
-        get() = _state
-
-    suspend fun handleIntents() {
-        // ViewModel update the repository layer.
-        // Use the Flow to consume the Channel values. -- ChannelFlow
-        // https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/channel-flow.html
-        userIntentChannel.consumeAsFlow().collect { userIntent ->
-            // create a new viewState and set that to the value in the channel
-            // Render of the MVI
-            //TODO: add LCE<Result>(Loading/Content/Error)
-            _state.value = reduce(userIntent)
+    override suspend fun reducer(
+        userIntent: DetailsUserIntent,
+        currentState: WallpaperDetailsViewState
+    ): WallpaperDetailsViewState {
+        when (userIntent) {
+            is DetailsUserIntent.GetWallpaper -> {
+                return _state.value.copy(
+                    loading = false,
+                    wallpaperDetails = repository.getWallPaperDetails(userIntent.id)
+                )
+            }
         }
-    }
 
-    /**
-     * Takes old state and creates a new immutable state for the UI to render.
-     */
-    private suspend fun reduce(userIntent: DetailsUserIntent) = when (userIntent) {
-        is DetailsUserIntent.GetWallpaper -> {
-            _state.value.copy(loading = false, wallpaperDetails = repository.getWallPaperDetails(userIntent.id))
-        }
     }
 }

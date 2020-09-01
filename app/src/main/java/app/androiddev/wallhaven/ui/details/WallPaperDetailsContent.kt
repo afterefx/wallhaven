@@ -61,7 +61,7 @@ fun imageDetail(wallpaperDetails: WallpaperDetails) {
                 Spacer(modifier = Modifier.preferredHeight(8.dp))
 
                 CoilImage(
-                    data = data.thumbs.small,
+                    data = data.thumbs.large,
                     modifier = Modifier.aspectRatio(data.ratio.toFloat()).fillMaxSize()
                 )
 

@@ -1,21 +1,76 @@
-package app.androiddev.wallhaven.ui
+package app.androiddev.wallhaven.ui.gallery
 
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.RowScope.gravity
 import androidx.compose.material.Button
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.viewModel
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
+import app.androiddev.wallhaven.ui.ScreenState
 import dev.chrisbanes.accompanist.coil.CoilImage
+
+@Composable
+inline fun <reified T : GalleryViewModel> GalleryPage(
+    operation: GalleryOperation,
+    noinline updateScreen: (ScreenState) -> Unit,
+    noinline updateId: (String) -> Unit,
+) {
+    val viewmodel: T = viewModel()
+    val state by viewmodel.state.collectAsState()
+    val vmAction = GalleryAction()
+    val scrollState: ScrollState = rememberScrollState(0f)
+
+
+    if (state.loading) {
+        vmAction.action(op = operation, vm = viewmodel, page = 1)
+        LoadingScreen()
+    } else {
+        Column(
+            modifier = Modifier
+                .verticalScroll(
+                    scrollState,
+                    enabled = true,
+                    reverseScrolling = false
+                )
+                .clipToBounds()
+                .padding(InnerPadding(0.dp)),
+            verticalArrangement= Arrangement.Top,
+            horizontalGravity = Alignment.Start,
+        ) {
+            val prev = {
+                vmAction.action(
+                    operation,
+                    vm = viewmodel,
+                    page = (state.page - 1)
+                )
+            }
+            val next = {
+                vmAction.action(
+                    operation,
+                    vm = viewmodel,
+                    page = (state.page + 1)
+                )
+            }
+            state.list?.let { list ->
+                PageButtons(page = state.page, onNext = next, onPrev = prev)
+                Gallery(gridList = list, updateScreen = updateScreen, updateId = updateId)
+                PageButtons(page = state.page, onNext = next, onPrev = prev)
+            }
+            Spacer(modifier = Modifier.height(150.dp))
+        }
+    }
+}
 
 @Composable
 fun Gallery(

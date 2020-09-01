@@ -17,6 +17,7 @@ import app.androiddev.wallhaven.theme.DarkColorPalette
 import app.androiddev.wallhaven.theme.DynamicTheme
 import app.androiddev.wallhaven.ui.details.WallPaperDetailsContent
 import app.androiddev.wallhaven.ui.latest.LatestContent
+import app.androiddev.wallhaven.ui.random.RandomContent
 import app.androiddev.wallhaven.ui.toplist.TopList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,9 +26,11 @@ import kotlinx.coroutines.launch
 fun AppContainer() {
     var activityViewState = MainActivityViewState(ScreenState.Latest)
     var currentScreen by remember { mutableStateOf(activityViewState.currentScreen) }
+    var previousScreen by remember { mutableStateOf(activityViewState.currentScreen) }
     var wallpaperId by remember { mutableStateOf("dgrgql") }
 
     val updateScreen: (ScreenState) -> Unit = { newScreen ->
+        previousScreen = currentScreen
         currentScreen = newScreen
         activityViewState.currentScreen = newScreen
     }
@@ -43,7 +46,11 @@ fun AppContainer() {
         }
         Scaffold(
             topBar = {
-                TitleContent(currentScreen = currentScreen, updateScreen = updateScreen)
+                TitleContent(
+                    currentScreen = currentScreen,
+                    prev = previousScreen,
+                    updateScreen = updateScreen
+                )
             },
             bodyContent = {
                 when (currentScreen) {
@@ -60,7 +67,9 @@ fun AppContainer() {
                     ScreenState.TopList -> {
                         TopList(updateScreen, updateWallpaper)
                     }
-                    ScreenState.Random -> TODO()
+                    ScreenState.Random -> {
+                        RandomContent(updateScreen, updateWallpaper)
+                    }
                 }
             },
             bottomBar = {
@@ -121,15 +130,17 @@ fun BottomNavigation(currentScreen: ScreenState, updateScreen: (ScreenState) -> 
 @Composable
 fun TitleContent(
     currentScreen: ScreenState,
+    prev: ScreenState,
     modifier: Modifier = Modifier,
     updateScreen: (ScreenState) -> Unit
 ) {
     when (currentScreen) {
         ScreenState.Latest -> TopAppBar("Latest")
         ScreenState.TopList -> TopAppBar("Top")
+        ScreenState.Random -> TopAppBar("Random")
         ScreenState.Detail -> TopAppBar("Details") {
             IconButton(onClick = {
-                updateScreen(ScreenState.Latest)
+                updateScreen(prev)
             }) {
                 Icon(asset = vectorResource(id = R.drawable.ic_arrow_back))
             }

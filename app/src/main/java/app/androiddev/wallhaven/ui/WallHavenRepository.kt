@@ -42,6 +42,10 @@ class WallHavenRepository @Inject constructor(
         return search(SearchQuery(page = page, sorting = Sort.Toplist))
     }
 
+    suspend fun getRandom(): SearchResults {
+        return search(SearchQuery(sorting = Sort.Random))
+    }
+
     suspend fun search(query: SearchQuery = SearchQuery()): SearchResults {
         return wallHavenApi.getSearch(
             query.query,

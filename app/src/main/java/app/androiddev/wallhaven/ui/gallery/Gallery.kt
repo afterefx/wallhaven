@@ -25,12 +25,12 @@ import dev.chrisbanes.accompanist.coil.CoilImage
 inline fun <reified T : GalleryViewModel> GalleryPage(
     operation: GalleryOperation,
     noinline updateScreen: (ScreenState) -> Unit,
-    noinline updateId: (String) -> Unit
+    noinline updateId: (String) -> Unit,
+    scrollState: ScrollState
 ) {
     val viewmodel: T = viewModel()
     val state by viewmodel.state.collectAsState()
     val vmAction = GalleryAction()
-    val scrollState: ScrollState = rememberScrollState(0f)
 
     if (!state.initialized) {
         vmAction.action(
@@ -118,7 +118,7 @@ fun ThumbNail(wallpaper: WallpaperDetails, modifier: Modifier = Modifier) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
-                horizontalGravity = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("Loading", modifier = Modifier.gravity(align = Alignment.CenterVertically))
             }
@@ -164,7 +164,7 @@ fun LoadingScreen() {
     Column(
         modifier = Modifier.fillMaxSize().background(Color.Black),
         verticalArrangement = Arrangement.Center,
-        horizontalGravity = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Loading", fontSize = 40.sp, color = Color.White, textAlign = TextAlign.Center)
     }

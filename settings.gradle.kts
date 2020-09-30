@@ -3,10 +3,10 @@ include(":app")
 
 pluginManagement {
     repositories {
+        google()
         maven(url = "https://dl.bintray.com/kotlin/kotlin-eap/")
         gradlePluginPortal()
         jcenter()
-        google()
     }
 
     resolutionStrategy {

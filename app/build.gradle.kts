@@ -1,15 +1,22 @@
 plugins {
     id("com.android.application")
     id("dagger.hilt.android.plugin")
+    id("idea")
     kotlin("android")
     kotlin("kapt")
     kotlin("android.extensions")
 }
 
-val composeVersion = "1.0.0-alpha01"
-val kotlinVersion = "1.4.0"
+val composeVersion = "1.0.0-alpha03"
+val kotlinVersion = "1.4.10"
 val retrofitVersion = "2.9.0"
 val lifecycleVersion = "2.2.0"
+
+idea {
+    module {
+        isDownloadSources = true
+    }
+}
 
 dependencies {
 
@@ -40,7 +47,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
 
     // Coil/Accompanist
-    implementation("dev.chrisbanes.accompanist:accompanist-coil:0.2.0")
+    implementation("dev.chrisbanes.accompanist:accompanist-coil:0.2.2")
 
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.28.3-alpha")
@@ -88,7 +95,7 @@ android {
 
     composeOptions {
         kotlinCompilerVersion = "1.4.0"
-        kotlinCompilerExtensionVersion = "$composeVersion"
+        kotlinCompilerExtensionVersion = composeVersion
     }
 }
 

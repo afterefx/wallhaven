@@ -14,8 +14,11 @@ fun WallHavenApp(sharedPref: SharedPreferences) {
     if (showUI) {
         AppContainer()
     } else {
-        LoginUi(sharedPref) {
-            showUI = it
+        val stringResource = stringResource(id = R.string.API_KEY)
+        val saveApiToken: (String) -> Unit = {
+            sharedPref.edit().putString(stringResource, it).apply()
+            showUI = true
         }
+        LoginUi(saveApiToken)
     }
 }

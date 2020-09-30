@@ -2,6 +2,7 @@ package app.androiddev.wallhaven.ui.random
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
@@ -20,14 +21,14 @@ import app.androiddev.wallhaven.ui.gallery.*
 @Composable
 fun RandomContent(
     updateScreen: (ScreenState) -> Unit,
-    updateId: (String) -> Unit
+    updateId: (String) -> Unit,
+    scrollState: ScrollState
 ) {
     val operation = GalleryOperation.GetRandomListPage
 
     val viewmodel: RandomViewModel = viewModel()
     val state by viewmodel.state.collectAsState()
     val vmAction = GalleryAction()
-    val scrollState = rememberScrollState()
 
     if (!state.initialized) {
         vmAction.action(op = operation, vm = viewmodel)

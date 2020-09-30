@@ -3,6 +3,7 @@ package app.androiddev.wallhaven.ui
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -38,6 +39,10 @@ fun AppContainer() {
 
     val colors = remember { ColorState(DarkColorPalette.primary, DarkColorPalette.onPrimary) }
 
+    val latestScrollState = rememberScrollState(0f)
+    val topListScrollState = rememberScrollState(0f)
+    val randomScrollState = rememberScrollState(0f)
+
     DynamicTheme(colors = colors) {
         val scope = rememberCoroutineScope()
         scope.launch(Dispatchers.IO) {
@@ -55,7 +60,7 @@ fun AppContainer() {
             bodyContent = {
                 when (currentScreen) {
                     ScreenState.Latest -> {
-                        LatestContent(updateScreen, updateWallpaper)
+                        LatestContent(updateScreen, updateWallpaper, latestScrollState)
                     }
                     ScreenState.Detail -> {
                         WallPaperDetailsContent(
@@ -65,10 +70,10 @@ fun AppContainer() {
                         )
                     }
                     ScreenState.TopList -> {
-                        TopList(updateScreen, updateWallpaper)
+                        TopList(updateScreen, updateWallpaper, topListScrollState)
                     }
                     ScreenState.Random -> {
-                        RandomContent(updateScreen, updateWallpaper)
+                        RandomContent(updateScreen, updateWallpaper, randomScrollState)
                     }
                 }
             },
@@ -100,7 +105,7 @@ fun BottomNavigation(currentScreen: ScreenState, updateScreen: (ScreenState) -> 
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.Latest,
                     label = { Text(text = "Latest") },
-                    onSelect = {
+                    onClick = {
                         updateScreen(ScreenState.Latest)
                     },
                     icon = { Icon(asset = vectorResource(id = R.drawable.ic_home_white_24dp)) }
@@ -108,7 +113,7 @@ fun BottomNavigation(currentScreen: ScreenState, updateScreen: (ScreenState) -> 
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.TopList,
                     label = { Text(text = "Top List") },
-                    onSelect = {
+                    onClick = {
                         updateScreen(ScreenState.TopList)
                     },
                     icon = { Icon(asset = vectorResource(id = R.drawable.ic_favorite_white_24dp)) }
@@ -116,7 +121,7 @@ fun BottomNavigation(currentScreen: ScreenState, updateScreen: (ScreenState) -> 
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.Random,
                     label = { Text(text = "Random") },
-                    onSelect = {
+                    onClick = {
                         updateScreen(ScreenState.Random)
                     },
                     icon = { Icon(asset = vectorResource(id = R.drawable.ic_random)) }

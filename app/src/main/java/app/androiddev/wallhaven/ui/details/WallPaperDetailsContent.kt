@@ -3,13 +3,19 @@ package app.androiddev.wallhaven.ui.details
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.rememberZoomableController
+import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawLayer
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.DragObserver
+import androidx.compose.ui.gesture.dragGestureFilter
+import androidx.compose.ui.platform.ConfigurationAmbient
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,9 +27,9 @@ import dev.chrisbanes.accompanist.coil.CoilImage
 
 @Composable
 fun WallPaperDetailsContent(
-    id: String,
-    updateScreen: (ScreenState) -> Unit,
-    modifier: Modifier = Modifier
+        id: String,
+        updateScreen: (ScreenState) -> Unit,
+        modifier: Modifier = Modifier
 ) {
 
     val viewmodel: WallPaperDetailsViewModel = viewModel()
@@ -45,75 +51,150 @@ fun WallPaperDetailsContent(
 @Composable
 fun loadingScreen() {
     Text(
-        text = "LOADING DATA",
-        modifier = Modifier.fillMaxSize(),
-        textAlign = TextAlign.Center,
-        fontSize = 40.sp
+            text = "LOADING DATA",
+            modifier = Modifier.fillMaxSize(),
+            textAlign = TextAlign.Center,
+            fontSize = 40.sp
     )
 }
 
 @Composable
 fun imageDetail(wallpaperDetails: WallpaperDetails) {
-    ScrollableColumn(modifier = Modifier.fillMaxSize()) {
+    val config = ConfigurationAmbient.current
+    val screenWidth = config.screenWidthDp
+    var scale by remember { mutableStateOf(1f) }
+    val zoomableController = rememberZoomableController { if (scale >= 1f) scale *= it else scale = 1f }
+    var xOffset by remember { mutableStateOf(0f) }
+    var yOffset by remember { mutableStateOf(0f) }
+    val panned = (xOffset != 0f || yOffset != 0f)
+    val zoomedIn = scale > 1f
+    var origImageWidth by remember { mutableStateOf(0f) }
+    var origImageHeight by remember { mutableStateOf(0f) }
+    var imageDisplayedWidth by remember { mutableStateOf(0f) }
+    var imageDisplayedHeight by remember { mutableStateOf(0f) }
+
+    ScrollableColumn(modifier = Modifier
+            .fillMaxSize()
+            .clickable(
+                    indication = null,
+                    onDoubleClick = {
+                        if (panned || zoomedIn) {
+                            scale = 1f
+                            xOffset = 0f
+                            yOffset = 0f
+                        }
+
+                    },
+                    onClick = {}
+            )
+            .zoomable(zoomableController)
+    ) {
         wallpaperDetails.let { data ->
             Column(modifier = Modifier.fillMaxHeight()) {
 
                 Spacer(modifier = Modifier.preferredHeight(8.dp))
 
-                CoilImage(
-                    data = data.thumbs.large,
-                    modifier = Modifier.aspectRatio(data.ratio.toFloat()).fillMaxSize()
-                )
+                Box(
+                        Modifier
+                                .dragGestureFilter(object : DragObserver {
+                                    override fun onDrag(dragDistance: Offset): Offset {
+                                        xOffset += (dragDistance.x * 0.6f)
+                                        yOffset += (dragDistance.y * 0.6f)
+                                        return dragDistance
+                                    }
+                                })
+                                .fillMaxSize()
+                ) {
+                    CoilImage(
+                            data = data.path,
+                            modifier = Modifier
+                                    .fillMaxSize()
+                                    .drawLayer(scaleX = scale, scaleY = scale)
+//                                    .offset(x = xOffset.dp, y = yOffset.dp)
+                                    .offset(x = xOffset.coerceIn(
+                                            minimumValue = if (zoomedIn) 0f - ((imageDisplayedWidth * scale) / 2) else 0f,
+                                            maximumValue = 0f)
+                                            .dp,
+                                            y = yOffset.coerceIn(
+                                                    minimumValue = if (zoomedIn) 0f - ((imageDisplayedHeight * scale) / 2) else 0f,
+                                                    maximumValue = 0f)
+                                                    .dp),
 
-                Column(modifier = Modifier.padding(24.dp)) {
+                            onRequestCompleted = {
+                                origImageWidth = it.image?.width?.toFloat() ?: 0f
+                                origImageHeight = it.image?.height?.toFloat() ?: 0f
+                                imageDisplayedWidth = (screenWidth / origImageWidth) * origImageWidth
+                                imageDisplayedHeight = (screenWidth / origImageWidth) * origImageHeight
+                            }
+                    )
+                }
+                Column {
+                    TextLabel(label = "screenWidthDp", content = screenWidth.toString())
+                    TextLabel(label = "origWidth", content = origImageWidth.toString())
+                    TextLabel(label = "origHeight", content = origImageHeight.toString())
+                    TextLabel(label = "width", content = imageDisplayedWidth.toString())
+                    TextLabel(label = "height", content = imageDisplayedHeight.toString())
+                    TextLabel("Scale", scale.toString())
+                    TextLabel("xOffset", xOffset.toString())
+                    TextLabel(label = "yOffset", content = yOffset.toString())
+                    TextLabel("xOffsetDp", xOffset.dp.toString())
+                    TextLabel(label = "yOffsetDp", content = yOffset.dp.toString())
+                    TextLabel(label = "minX", content = (0f - ((imageDisplayedWidth * scale) / 2)).toString())
+                    TextLabel(label = "minY", content = (0f - ((imageDisplayedHeight * scale) / 2)).toString())
 
-                    Spacer(modifier = Modifier.preferredHeight(8.dp))
 
-                    Label(text = "Category: ") {
-                        Text(text = data.category, style = MaterialTheme.typography.body1)
-                    }
+                }
 
-                    Label(text = "Colors:") {
-                        ColorTable(data.colors)
-                    }
+                if (scale <= 1f) {
+                    Column(modifier = Modifier.padding(24.dp)) {
 
-                    Label("Tags:")
-                    Table(items = data.tags.map { it.name }, maxItemsPerRow = 3) {
-                        Text(text = it)
-                        Spacer(modifier = Modifier.width(4.dp))
-                    }
+                        Spacer(modifier = Modifier.preferredHeight(8.dp))
+
+                        Label(text = "Category: ") {
+                            Text(text = data.category, style = MaterialTheme.typography.body1)
+                        }
+
+                        Label(text = "Colors:") {
+                            ColorTable(data.colors)
+                        }
+
+                        Label("Tags:")
+                        Table(items = data.tags.map { it.name }, maxItemsPerRow = 3) {
+                            Text(text = it)
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
 
 
-                    Label(text = "Uploader: ") {
-                        Text(
-                            text = data.uploader.username,
-                            style = MaterialTheme.typography.body1
-                        )
-                    }
-                    Label(text = "Created: ") {
-                        Text(text = data.created_at, style = MaterialTheme.typography.body1)
-                    }
-                    Label(text = "Purity: ") {
-                        Text(text = data.purity, style = MaterialTheme.typography.body1)
-                    }
-                    Label(text = "Ratio: ") {
-                        Text(text = data.ratio, style = MaterialTheme.typography.body1)
-                    }
-                    Label(text = "Resolution: ") {
-                        Text(text = data.resolution, style = MaterialTheme.typography.body1)
-                    }
-                    Label(text = "Views: ") {
-                        Text(
-                            text = data.views.toString(),
-                            style = MaterialTheme.typography.body1
-                        )
-                    }
-                    Label(text = "Favorites: ") {
-                        Text(
-                            text = data.favorites.toString(),
-                            style = MaterialTheme.typography.body1
-                        )
-                    }
+                        Label(text = "Uploader: ") {
+                            Text(
+                                    text = data.uploader.username,
+                                    style = MaterialTheme.typography.body1
+                            )
+                        }
+                        Label(text = "Created: ") {
+                            Text(text = data.created_at, style = MaterialTheme.typography.body1)
+                        }
+                        Label(text = "Purity: ") {
+                            Text(text = data.purity, style = MaterialTheme.typography.body1)
+                        }
+                        Label(text = "Ratio: ") {
+                            Text(text = data.ratio, style = MaterialTheme.typography.body1)
+                        }
+                        Label(text = "Resolution: ") {
+                            Text(text = data.resolution, style = MaterialTheme.typography.body1)
+                        }
+                        Label(text = "Views: ") {
+                            Text(
+                                    text = data.views.toString(),
+                                    style = MaterialTheme.typography.body1
+                            )
+                        }
+                        Label(text = "Favorites: ") {
+                            Text(
+                                    text = data.favorites.toString(),
+                                    style = MaterialTheme.typography.body1
+                            )
+                        }
 /*
                         val created_at: String,
                         val dimension_x: Int,
@@ -134,6 +215,7 @@ fun imageDetail(wallpaperDetails: WallpaperDetails) {
                         val url: String,
                         val views: Int
 */
+                    }
                 }
             }
         }
@@ -150,9 +232,9 @@ private fun ColorTable(colors: List<String>) {
 
 @Composable
 private fun Table(
-    items: List<String>,
-    maxItemsPerRow: Int = 4,
-    reducer: @Composable (String) -> Unit,
+        items: List<String>,
+        maxItemsPerRow: Int = 4,
+        reducer: @Composable (String) -> Unit,
 ) {
     var number = 0
     while (number < items.size) {
@@ -171,18 +253,24 @@ private fun Table(
 @Composable
 private fun ColorBox(colorString: String) {
     Box(
-        backgroundColor = Color(colorString),
-        modifier = Modifier
+            backgroundColor = Color(colorString),
+            modifier = Modifier
     ) {
         Text(text = colorString, fontSize = 12.sp)
     }
 }
 
+@Composable
+private fun TextLabel(label: String, content: String) {
+    Label("$label: ") {
+        Text(content)
+    }
+}
 
 @Composable
 private fun Label(text: String, value: (@Composable () -> Unit)? = null) {
     if (value != null) {
-        Row(verticalGravity = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = text, style = MaterialTheme.typography.h5)
             value()
         }

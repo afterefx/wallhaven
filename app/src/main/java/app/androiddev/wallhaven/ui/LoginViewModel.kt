@@ -13,7 +13,7 @@ import kotlin.coroutines.resumeWithException
 
 class LoginViewModel @ViewModelInject constructor() : ViewModel() {
 
-    fun doLogin(username: String, password: String, callback : (String) -> Unit) {
+    fun doLogin(username: String, password: String, callback: (String) -> Unit) {
         viewModelScope.launch(context = Dispatchers.IO) {
             val sessionToken = getSessionToken()
             doLogin(sessionToken, username, password)

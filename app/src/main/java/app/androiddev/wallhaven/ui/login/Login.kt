@@ -1,10 +1,10 @@
 package app.androiddev.wallhaven.ui.login
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -26,39 +26,39 @@ fun LoginUi(saveApiToken: (String) -> Unit = {}) {
         Column(modifier = Modifier.padding(16.dp)) {
             Spacer(modifier = Modifier.height(90.dp))
             Text(
-                    "Wallhaven",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    fontSize = 60.sp
+                "Wallhaven",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                fontSize = 60.sp
             )
             Spacer(modifier = Modifier.height(90.dp))
             var username by remember { mutableStateOf(TextFieldValue("")) }
             var password by remember { mutableStateOf(TextFieldValue("")) }
 
             TextField(
-                    value = username,
-                    onValueChange = { s: TextFieldValue -> username = s },
-                    label = @Composable { Text(text = "Username") },
-                    shape = MaterialTheme.shapes.medium,
-                    backgroundColor = Color.White,
-                    activeColor = Color.Black,
-                    inactiveColor = Color.Black,
-                    modifier = Modifier.fillMaxWidth()
+                value = username,
+                onValueChange = { s: TextFieldValue -> username = s },
+                label = @Composable { Text(text = "Username") },
+                shape = MaterialTheme.shapes.medium,
+                backgroundColor = Color.White,
+                activeColor = Color.Black,
+                inactiveColor = Color.Black,
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
-                    value = password,
-                    onValueChange = { s: TextFieldValue -> password = s },
-                    label = @Composable { Text(text = "Password") },
-                    shape = MaterialTheme.shapes.medium,
-                    visualTransformation = PasswordVisualTransformation(),
-                    backgroundColor = Color.White,
-                    activeColor = Color.Black,
-                    inactiveColor = Color.Black,
-                    modifier = Modifier.fillMaxWidth()
+                value = password,
+                onValueChange = { s: TextFieldValue -> password = s },
+                label = @Composable { Text(text = "Password") },
+                shape = MaterialTheme.shapes.medium,
+                visualTransformation = PasswordVisualTransformation(),
+                backgroundColor = Color.White,
+                activeColor = Color.Black,
+                inactiveColor = Color.Black,
+                modifier = Modifier.fillMaxWidth()
             )
 
             val vm: LoginViewModel = viewModel()

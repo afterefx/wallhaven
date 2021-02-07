@@ -1,26 +1,27 @@
 package app.androiddev.wallhaven.ui.gallery
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.RowScope.gravity
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.viewModel
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.ScreenState
 import dev.chrisbanes.accompanist.coil.CoilImage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 inline fun <reified T : GalleryViewModel> GalleryPage(
     operation: GalleryOperation,
@@ -40,8 +41,11 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
         )
     }
 
+    val scope = rememberCoroutineScope()
     val prev = {
-        scrollState.scrollTo(0f)
+        scope.launch {
+            scrollState.scrollTo(0f)
+        }
         val prevPage = state.page - 1
         vmAction.action(
             GalleryOperation.Loading,
@@ -55,7 +59,9 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
         )
     }
     val next = {
-        scrollState.scrollTo(0f)
+        scope.launch {
+            scrollState.scrollTo(0f)
+        }
         val nextPage = state.page + 1
         vmAction.action(
             GalleryOperation.Loading,
@@ -74,11 +80,13 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
         if (state.loading) {
             LoadingScreen()
         } else {
-            ScrollableColumn(scrollState = scrollState) {
-                state.list?.let { list ->
-                    Gallery(gridList = list, updateScreen = updateScreen, updateId = updateId)
+            LazyColumn {
+                item {
+                    state.list?.let { list ->
+                        Gallery(gridList = list, updateScreen = updateScreen, updateId = updateId)
+                    }
+                    Spacer(modifier = Modifier.height(120.dp))
                 }
-                Spacer(modifier = Modifier.height(120.dp))
             }
         }
     }
@@ -104,7 +112,6 @@ fun Gallery(
                     })
                 )
             }
-
         }
     }
 }
@@ -113,17 +120,19 @@ fun Gallery(
 fun ThumbNail(wallpaper: WallpaperDetails, modifier: Modifier = Modifier) {
     CoilImage(
         data = wallpaper.thumbs.small,
-        modifier = Modifier.size(150.dp) + modifier,
-        loading = @Composable {
+        contentDescription = wallpaper.category,
+        modifier = Modifier
+            .size(150.dp)
+            .then(modifier),
+        loading = {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Loading", modifier = Modifier.gravity(align = Alignment.CenterVertically))
+                Text("Loading", modifier = Modifier.align(Alignment.CenterHorizontally))
             }
-        },
-    )
+        })
 }
 
 @Composable
@@ -133,9 +142,11 @@ fun PageButtons(
     }
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(8.dp)
-            .gravity(align = Alignment.CenterVertically),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         if (page > 1) {
             Button(onClick = onPrev) {
@@ -159,10 +170,13 @@ fun PageButtons(
     }
 }
 
+@Preview
 @Composable
 fun LoadingScreen() {
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.Black),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

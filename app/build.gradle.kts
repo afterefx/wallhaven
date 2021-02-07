@@ -1,64 +1,14 @@
 plugins {
     id("com.android.application")
     id("dagger.hilt.android.plugin")
-    id("idea")
     kotlin("android")
     kotlin("kapt")
-    kotlin("android.extensions")
 }
 
-val composeVersion = "1.0.0-alpha03"
-val kotlinVersion = "1.4.10"
 val retrofitVersion = "2.9.0"
 val lifecycleVersion = "2.2.0"
-
-idea {
-    module {
-        isDownloadSources = true
-    }
-}
-
-dependencies {
-
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-    implementation("androidx.core:core-ktx:1.5.0-alpha01")
-    implementation("androidx.appcompat:appcompat:1.3.0-alpha01")
-    implementation("com.google.android.material:material:1.2.0")
-
-    implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
-
-    implementation("androidx.activity:activity-ktx:1.1.0")
-    implementation("androidx.fragment:fragment-ktx:1.2.5")
-
-    implementation("androidx.compose.animation:animation:$composeVersion")
-    implementation("androidx.compose.foundation:foundation:$composeVersion")
-    implementation("androidx.compose.foundation:foundation-layout:$composeVersion")
-    implementation("androidx.compose.material:material:$composeVersion")
-    implementation("androidx.compose.material:material-icons-extended:$composeVersion")
-    implementation("androidx.compose.runtime:runtime:$composeVersion")
-    implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
-    implementation("androidx.compose.ui:ui:$composeVersion")
-    implementation("androidx.ui:ui-tooling:$composeVersion")
-
-    implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
-    implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
-
-    // Coil/Accompanist
-    implementation("dev.chrisbanes.accompanist:accompanist-coil:0.2.2")
-
-    //Dagger Hilt
-    implementation("com.google.dagger:hilt-android:2.28.3-alpha")
-    kapt("com.google.dagger:hilt-android-compiler:2.28.3-alpha")
-    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02")
-    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha02")
-
-    testImplementation("junit:junit:4.13")
-    androidTestImplementation("androidx.test.ext:junit:1.1.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
-}
+val kotlinVersion: String by rootProject.extra
+val composeVersion: String by rootProject.extra
 
 android {
     compileSdkVersion(30)
@@ -82,29 +32,71 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
+        useIR = true
     }
+
     buildFeatures {
         compose = true
     }
 
     composeOptions {
-        kotlinCompilerVersion = "1.4.0"
         kotlinCompilerExtensionVersion = composeVersion
     }
 }
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+    implementation("androidx.core:core-ktx:1.5.0-alpha01")
+    implementation("androidx.appcompat:appcompat:1.3.0-alpha01")
+    implementation("com.google.android.material:material:1.2.0")
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-        freeCompilerArgs = listOf(
-            "-Xallow-jvm-ir-dependencies",
-            "-Xskip-prerelease-check"
-        )
-    }
+    implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+
+    implementation("androidx.activity:activity-ktx:1.1.0")
+    implementation("androidx.fragment:fragment-ktx:1.2.5")
+
+    // COMPOSE
+    implementation("androidx.compose.animation:animation:$composeVersion")
+    implementation("androidx.compose.ui:ui:$composeVersion")
+    // Tooling support (Previews, etc.)
+    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
+    // Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
+    implementation("androidx.compose.foundation:foundation:$composeVersion")
+    // Material Design
+    implementation("androidx.compose.material:material:$composeVersion")
+    // Material design icons)
+    implementation("androidx.compose.material:material-icons-core:$composeVersion")
+    implementation("androidx.compose.material:material-icons-extended:$composeVersion")
+    // Integration with observables
+    implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
+    implementation("androidx.compose.runtime:runtime-rxjava2:$composeVersion")
+
+    // UI Tests
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
+
+    implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
+    implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
+
+    // Coil/Accompanist
+    implementation("dev.chrisbanes.accompanist:accompanist-coil:0.5.0")
+
+    //Dagger Hilt
+    implementation("com.google.dagger:hilt-android:2.28.3-alpha")
+    kapt("com.google.dagger:hilt-android-compiler:2.28.3-alpha")
+    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02")
+    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha02")
+
+    testImplementation("junit:junit:4.13")
+    androidTestImplementation("androidx.test.ext:junit:1.1.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 }

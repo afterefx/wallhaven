@@ -1,13 +1,18 @@
 package app.androiddev.wallhaven.ui
 
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.vectorResource
@@ -22,6 +27,12 @@ import app.androiddev.wallhaven.ui.random.RandomContent
 import app.androiddev.wallhaven.ui.toplist.TopList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
+const val LATEST = "Latest"
+const val DETAILS = "Details"
+const val RANDOM = "Random"
+const val TOP = "Top"
+const val TOP_LIST = "Top List"
 
 @Composable
 fun AppContainer() {
@@ -104,33 +115,47 @@ fun BottomNavigation(currentScreen: ScreenState, updateScreen: (ScreenState) -> 
             listOf(
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.Latest,
-                    label = { Text(text = "Latest") },
+                    label = { Text(text = LATEST) },
                     onClick = {
                         updateScreen(ScreenState.Latest)
                     },
-                    icon = { Icon(asset = vectorResource(id = R.drawable.ic_home_white_24dp)) }
+                    icon = {
+                        Icon(
+                            imageVector = vectorResource(id = R.drawable.ic_home_white_24dp),
+                            contentDescription = LATEST
+                        )
+                    }
                 ),
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.TopList,
-                    label = { Text(text = "Top List") },
+                    label = { Text(text = TOP_LIST) },
                     onClick = {
                         updateScreen(ScreenState.TopList)
                     },
-                    icon = { Icon(asset = vectorResource(id = R.drawable.ic_favorite_white_24dp)) }
+                    icon = {
+                        Icon(
+                            imageVector = vectorResource(id = R.drawable.ic_favorite_white_24dp),
+                            contentDescription = TOP_LIST
+                        )
+                    }
                 ),
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.Random,
-                    label = { Text(text = "Random") },
+                    label = { Text(text = RANDOM) },
                     onClick = {
                         updateScreen(ScreenState.Random)
                     },
-                    icon = { Icon(asset = vectorResource(id = R.drawable.ic_random)) }
+                    icon = {
+                        Icon(
+                            imageVector = vectorResource(id = R.drawable.ic_random),
+                            contentDescription = RANDOM
+                        )
+                    }
                 )
             )
         }
     )
 }
-
 
 @Composable
 fun TitleContent(
@@ -140,14 +165,19 @@ fun TitleContent(
     updateScreen: (ScreenState) -> Unit
 ) {
     when (currentScreen) {
-        ScreenState.Latest -> TopAppBar("Latest")
-        ScreenState.TopList -> TopAppBar("Top")
-        ScreenState.Random -> TopAppBar("Random")
-        ScreenState.Detail -> TopAppBar("Details") {
-            IconButton(onClick = {
-                updateScreen(prev)
-            }) {
-                Icon(asset = vectorResource(id = R.drawable.ic_arrow_back))
+        ScreenState.Latest -> TopAppBar(LATEST)
+        ScreenState.TopList -> TopAppBar(TOP)
+        ScreenState.Random -> TopAppBar(RANDOM)
+        ScreenState.Detail -> {
+            TopAppBar(DETAILS) {
+                IconButton(onClick = {
+                    updateScreen(prev)
+                }) {
+                    Icon(
+                        imageVector = vectorResource(id = R.drawable.ic_arrow_back),
+                        contentDescription = DETAILS
+                    )
+                }
             }
         }
     }

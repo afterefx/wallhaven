@@ -2,7 +2,9 @@ package app.androiddev.wallhaven.ui.gallery
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -21,7 +23,8 @@ import dev.chrisbanes.accompanist.coil.CoilImage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalFoundationApi::class)
 @Composable
 inline fun <reified T : GalleryViewModel> GalleryPage(
     operation: GalleryOperation,
@@ -80,11 +83,17 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
         if (state.loading) {
             LoadingScreen()
         } else {
-            LazyColumn {
+            LazyVerticalGrid(cells = GridCells.Fixed(2)) {
+                items(state.list ?: emptyList()) { wallpaper ->
+                    ThumbNail(
+                        wallpaper,
+                        Modifier.clickable(onClick = {
+                            updateId(wallpaper.id)
+                            updateScreen(ScreenState.Detail)
+                        })
+                    )
+                }
                 item {
-                    state.list?.let { list ->
-                        Gallery(gridList = list, updateScreen = updateScreen, updateId = updateId)
-                    }
                     Spacer(modifier = Modifier.height(120.dp))
                 }
             }
@@ -137,9 +146,10 @@ fun ThumbNail(wallpaper: WallpaperDetails, modifier: Modifier = Modifier) {
 
 @Composable
 fun PageButtons(
-    page: Int, onNext: () -> Unit, onPrev: () -> Unit, showPrev: () -> Boolean = {
-        page > 1
-    }
+    page: Int,
+    onNext: () -> Unit,
+    onPrev: () -> Unit,
+    showPrev: () -> Boolean = { page > 1 }
 ) {
     Row(
         modifier = Modifier
@@ -148,7 +158,7 @@ fun PageButtons(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (page > 1) {
+        if (showPrev()) {
             Button(onClick = onPrev) {
                 Text(text = "Prev")
             }

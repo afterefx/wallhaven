@@ -2,6 +2,9 @@ package app.androiddev.wallhaven.util
 
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 
+/**
+ * Places the list of wallpapers into a grid format 2 wide
+ */
 fun gridWallPapers(wallpapersList: List<WallpaperDetails>): List<List<WallpaperDetails>> {
     val gridList: MutableList<List<WallpaperDetails>> = mutableListOf()
 

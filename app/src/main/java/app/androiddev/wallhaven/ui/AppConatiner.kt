@@ -1,7 +1,7 @@
 package app.androiddev.wallhaven.ui
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -50,9 +50,9 @@ fun AppContainer() {
 
     val colors = remember { ColorState(DarkColorPalette.primary, DarkColorPalette.onPrimary) }
 
-    val latestScrollState = rememberScrollState(0f)
-    val topListScrollState = rememberScrollState(0f)
-    val randomScrollState = rememberScrollState(0f)
+    val latestListState = rememberLazyListState()
+    val topListListState = rememberLazyListState()
+    val randomListState = rememberLazyListState()
 
     DynamicTheme(colors = colors) {
         val scope = rememberCoroutineScope()
@@ -71,7 +71,7 @@ fun AppContainer() {
             bodyContent = {
                 when (currentScreen) {
                     ScreenState.Latest -> {
-                        LatestContent(updateScreen, updateWallpaper, latestScrollState)
+                        LatestContent(updateScreen, updateWallpaper, latestListState)
                     }
                     ScreenState.Detail -> {
                         WallPaperDetailsContent(
@@ -81,10 +81,10 @@ fun AppContainer() {
                         )
                     }
                     ScreenState.TopList -> {
-                        TopList(updateScreen, updateWallpaper, topListScrollState)
+                        TopList(updateScreen, updateWallpaper, topListListState)
                     }
                     ScreenState.Random -> {
-                        RandomContent(updateScreen, updateWallpaper, randomScrollState)
+                        RandomContent(updateScreen, updateWallpaper, randomListState)
                     }
                 }
             },

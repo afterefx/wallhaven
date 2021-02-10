@@ -3,8 +3,10 @@ package app.androiddev.wallhaven.ui.gallery
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -30,7 +32,7 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
     operation: GalleryOperation,
     noinline updateScreen: (ScreenState) -> Unit,
     noinline updateId: (String) -> Unit,
-    scrollState: ScrollState
+    lazyListState: LazyListState = rememberLazyListState(),
 ) {
     val viewmodel: T = viewModel()
     val state by viewmodel.state.collectAsState()
@@ -47,7 +49,7 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
     val scope = rememberCoroutineScope()
     val prev = {
         scope.launch {
-            scrollState.scrollTo(0f)
+            lazyListState.snapToItemIndex(0)
         }
         val prevPage = state.page - 1
         vmAction.action(
@@ -63,7 +65,7 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
     }
     val next = {
         scope.launch {
-            scrollState.scrollTo(0f)
+            lazyListState.snapToItemIndex(0)
         }
         val nextPage = state.page + 1
         vmAction.action(
@@ -83,7 +85,7 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
         if (state.loading) {
             LoadingScreen()
         } else {
-            LazyVerticalGrid(cells = GridCells.Fixed(2)) {
+            LazyVerticalGrid(cells = GridCells.Fixed(2), state = lazyListState) {
                 items(state.list ?: emptyList()) { wallpaper ->
                     ThumbNail(
                         wallpaper,

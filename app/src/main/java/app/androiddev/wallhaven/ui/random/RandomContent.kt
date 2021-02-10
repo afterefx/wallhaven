@@ -5,6 +5,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
@@ -24,7 +25,7 @@ import kotlinx.coroutines.launch
 fun RandomContent(
     updateScreen: (ScreenState) -> Unit,
     updateId: (String) -> Unit,
-    scrollState: ScrollState
+    lazyListState: LazyListState,
 ) {
     val operation = GalleryOperation.GetRandomListPage
 
@@ -40,7 +41,7 @@ fun RandomContent(
     Column {
         RefreshButton {
             scope.launch {
-                scrollState.scrollTo(0f)
+                lazyListState.snapToItemIndex(0)
             }
             vmAction.action(
                 GalleryOperation.Loading,
@@ -54,7 +55,7 @@ fun RandomContent(
         if (state.loading) {
             LoadingScreen()
         } else {
-            LazyVerticalGrid(cells = GridCells.Fixed(2)) {
+            LazyVerticalGrid(cells = GridCells.Fixed(2), state = lazyListState) {
                 items(state.list ?: emptyList()) { wallpaper ->
                     ThumbNail(
                         wallpaper,

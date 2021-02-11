@@ -15,10 +15,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
  * T should be the ViewState
  * U should be the UserIntents sealed class of what actions can be performed
  */
-@ExperimentalCoroutinesApi
-abstract class StateChannel<T, U>(
-    private val initialState: T
-) {
+abstract class StateChannel<T, U>(initialState: T) {
 
     // basic Channel<T> to listen to intents and state changes in the ViewModel
     val userIntentChannel = Channel<U>()

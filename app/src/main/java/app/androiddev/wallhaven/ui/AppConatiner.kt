@@ -90,15 +90,12 @@ fun AppContainer() {
             },
             bottomBar = {
                 when (currentScreen) {
-                    ScreenState.Latest -> {
+                    ScreenState.Latest ->
                         BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
-                    }
-                    ScreenState.TopList -> {
+                    ScreenState.TopList ->
                         BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
-                    }
-                    ScreenState.Random -> {
+                    ScreenState.Random ->
                         BottomNavigation(currentScreen = currentScreen, updateScreen = updateScreen)
-                    }
                     ScreenState.Detail -> {
                         //no bottom bar
                     }
@@ -116,9 +113,7 @@ fun BottomNavigation(currentScreen: ScreenState, updateScreen: (ScreenState) -> 
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.Latest,
                     label = { Text(text = LATEST) },
-                    onClick = {
-                        updateScreen(ScreenState.Latest)
-                    },
+                    onClick = { updateScreen(ScreenState.Latest) },
                     icon = {
                         Icon(
                             imageVector = vectorResource(id = R.drawable.ic_home_white_24dp),
@@ -129,9 +124,7 @@ fun BottomNavigation(currentScreen: ScreenState, updateScreen: (ScreenState) -> 
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.TopList,
                     label = { Text(text = TOP_LIST) },
-                    onClick = {
-                        updateScreen(ScreenState.TopList)
-                    },
+                    onClick = { updateScreen(ScreenState.TopList) },
                     icon = {
                         Icon(
                             imageVector = vectorResource(id = R.drawable.ic_favorite_white_24dp),
@@ -142,9 +135,7 @@ fun BottomNavigation(currentScreen: ScreenState, updateScreen: (ScreenState) -> 
                 BottomNavigationItem(
                     selected = currentScreen == ScreenState.Random,
                     label = { Text(text = RANDOM) },
-                    onClick = {
-                        updateScreen(ScreenState.Random)
-                    },
+                    onClick = { updateScreen(ScreenState.Random) },
                     icon = {
                         Icon(
                             imageVector = vectorResource(id = R.drawable.ic_random),
@@ -190,4 +181,3 @@ fun TopAppBar(title: String, navigationIcon: @Composable (() -> Unit)? = null) {
         navigationIcon = navigationIcon
     )
 }
-

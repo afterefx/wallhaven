@@ -3,11 +3,9 @@ package app.androiddev.wallhaven.ui.details
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
-@ExperimentalCoroutinesApi
-class WallPaperDetailsViewModel @ViewModelInject  constructor(
+class WallPaperDetailsViewModel @ViewModelInject constructor(
     private val detailsStateChannel: DetailsStateChannel,
 ) : ViewModel() {
 

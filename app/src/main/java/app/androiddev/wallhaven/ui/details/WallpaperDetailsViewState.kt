@@ -3,7 +3,6 @@ package app.androiddev.wallhaven.ui.details
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.WallHavenRepository
 import app.androiddev.wallhaven.util.StateChannel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 data class WallpaperDetailsViewState(
@@ -22,7 +21,6 @@ sealed class DetailsUserIntent {
 /**
  * The ViewModel acts upon these events accordingly by making API calls or saving/retrieving data in the database via the Repository layer.
  */
-@ExperimentalCoroutinesApi
 class DetailsStateChannel @Inject constructor(
     private val repository: WallHavenRepository
 ) : StateChannel<WallpaperDetailsViewState, DetailsUserIntent>(WallpaperDetailsViewState()) {

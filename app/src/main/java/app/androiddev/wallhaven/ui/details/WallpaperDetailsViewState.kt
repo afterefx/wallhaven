@@ -2,6 +2,7 @@ package app.androiddev.wallhaven.ui.details
 
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.WallHavenRepository
+import app.androiddev.wallhaven.ui.gallery.GalleryUserIntent
 import app.androiddev.wallhaven.util.StateChannel
 import javax.inject.Inject
 
@@ -16,6 +17,7 @@ data class WallpaperDetailsViewState(
  */
 sealed class DetailsUserIntent {
     data class GetWallpaper(val id: String) : DetailsUserIntent()
+    object Loading : DetailsUserIntent()
 }
 
 /**
@@ -27,15 +29,19 @@ class DetailsStateChannel @Inject constructor(
 
     override suspend fun reducer(
         userIntent: DetailsUserIntent,
-    ): WallpaperDetailsViewState {
+    ): WallpaperDetailsViewState =
         when (userIntent) {
             is DetailsUserIntent.GetWallpaper -> {
-                return _state.value.copy(
+                _state.value.copy(
                     loading = false,
                     wallpaperDetails = repository.getWallPaperDetails(userIntent.id)
                 )
             }
+            is DetailsUserIntent.Loading -> {
+                _state.value.copy(
+                    loading = true,
+                    wallpaperDetails = null
+                )
+            }
         }
-
-    }
 }

@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.viewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.ScreenState
 import dev.chrisbanes.accompanist.coil.CoilImage
@@ -47,14 +47,14 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
     noinline updateId: (String) -> Unit,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    val viewmodel: T = viewModel()
-    val state by viewmodel.state.collectAsState()
+    val viewModel: T = viewModel()
+    val state by viewModel.state.collectAsState()
     val vmAction = GalleryAction()
 
     if (!state.initialized) {
         vmAction.action(
             operation,
-            vm = viewmodel,
+            vm = viewModel,
             page = 1
         )
     }
@@ -67,12 +67,12 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
         val prevPage = state.page - 1
         vmAction.action(
             GalleryOperation.Loading,
-            vm = viewmodel,
+            vm = viewModel,
             page = prevPage
         )
         vmAction.action(
             operation,
-            vm = viewmodel,
+            vm = viewModel,
             page = prevPage
         )
     }
@@ -83,12 +83,12 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
         val nextPage = state.page + 1
         vmAction.action(
             GalleryOperation.Loading,
-            vm = viewmodel,
+            vm = viewModel,
             page = nextPage
         )
         vmAction.action(
             operation,
-            vm = viewmodel,
+            vm = viewModel,
             page = nextPage
         )
     }

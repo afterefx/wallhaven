@@ -40,7 +40,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        useIR = true
     }
 
     buildFeatures {
@@ -53,16 +52,16 @@ android {
 }
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-    implementation("androidx.core:core-ktx:1.5.0-alpha01")
-    implementation("androidx.appcompat:appcompat:1.3.0-alpha01")
-    implementation("com.google.android.material:material:1.2.0")
+    implementation("androidx.core:core-ktx:1.5.0-beta01")
+    implementation("androidx.appcompat:appcompat:1.3.0-beta01")
+    implementation("com.google.android.material:material:1.3.0")
 
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
 
-    implementation("androidx.activity:activity-ktx:1.1.0")
-    implementation("androidx.fragment:fragment-ktx:1.2.5")
+    implementation("androidx.activity:activity-ktx:1.2.0")
+    implementation("androidx.fragment:fragment-ktx:1.3.0")
 
     // COMPOSE
     implementation("androidx.compose.animation:animation:$composeVersion")
@@ -79,6 +78,9 @@ dependencies {
     // Integration with observables
     implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
     implementation("androidx.compose.runtime:runtime-rxjava2:$composeVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha01")
+    implementation("androidx.activity:activity-compose:1.3.0-alpha02")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha07")
 
     // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
@@ -88,7 +90,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
 
     // Coil/Accompanist
-    implementation("dev.chrisbanes.accompanist:accompanist-coil:0.5.0")
+    implementation("dev.chrisbanes.accompanist:accompanist-coil:0.5.1")
 
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.28.3-alpha")

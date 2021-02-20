@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.consumeAsFlow
 
 
 /**
- * The ViewModel acts upon these events accordingly by making API calls or saving/retrieving data in the database via the Repository layer.
+ * The ViewModel acts upon these events accordingly by making API calls or saving/retrieving data
+ * in the database via the Repository layer.
  *
  * T should be the ViewState
  * U should be the UserIntents sealed class of what actions can be performed

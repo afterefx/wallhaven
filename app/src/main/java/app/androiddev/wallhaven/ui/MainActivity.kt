@@ -2,8 +2,8 @@ package app.androiddev.wallhaven.ui
 
 import android.content.Context
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.setContent
 import app.androiddev.wallhaven.R
 import dagger.hilt.android.AndroidEntryPoint
 

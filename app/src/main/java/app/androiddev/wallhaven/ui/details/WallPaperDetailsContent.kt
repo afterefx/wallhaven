@@ -1,7 +1,8 @@
 package app.androiddev.wallhaven.ui.details
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.rememberZoomableController
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
@@ -28,29 +29,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.AmbientConfiguration
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.viewModel
-import app.androiddev.wallhaven.extensions.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
+import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.ScreenState
 import dev.chrisbanes.accompanist.coil.CoilImage
 import dev.chrisbanes.accompanist.imageloading.ImageLoadState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun WallPaperDetailsContent(
     id: String,
     updateScreen: (ScreenState) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val viewmodel: WallPaperDetailsViewModel = viewModel()
-    val viewState: WallpaperDetailsViewState by viewmodel.state.collectAsState()
+    val viewModel: WallPaperDetailsViewModel = viewModel()
+    val viewState: WallpaperDetailsViewState by viewModel.state.collectAsState()
     val vmAction = DetailAction()
 
-    vmAction.action(op = DetailMVOperation.GetWallpaper, detailsViewModel = viewmodel, id = id)
+    vmAction.action(op = DetailMVOperation.GetWallpaper, detailsViewModel = viewModel, id = id)
 
     if (viewState.loading) {
         LoadingScreen()
@@ -72,9 +77,10 @@ fun LoadingScreen() {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageDetail(wallpaperDetails: WallpaperDetails) {
-    val config = AmbientConfiguration.current
+    val config = LocalConfiguration.current
     val screenWidth = config.screenWidthDp
     var scale by remember { mutableStateOf(1f) }
     val zoomableController =
@@ -90,7 +96,8 @@ fun ImageDetail(wallpaperDetails: WallpaperDetails) {
 
     LazyColumn(modifier = Modifier
         .fillMaxSize()
-        .clickable(
+//        .clickable(
+        .combinedClickable(
             onDoubleClick = {
                 if (panned || zoomedIn) {
                     scale = 1f
@@ -287,10 +294,15 @@ private fun Table(
 
 @Composable
 private fun ColorBox(colorString: String) {
+    val color = colorString.toColor()
     Box(
-        modifier = Modifier.background(Color(colorString))
+        modifier = Modifier.background(color)
     ) {
-        Text(text = colorString, fontSize = 12.sp)
+        Text(
+            text = colorString,
+            fontSize = 12.sp,
+            color = if (color.luminance() > 0.5f) Color.Black else Color.White
+        )
     }
 }
 

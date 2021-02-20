@@ -15,13 +15,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.viewModel
-import app.androiddev.wallhaven.extensions.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
+import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.ui.LoginViewModel
 
 @Composable
 fun LoginUi(saveApiToken: (String) -> Unit = {}) {
-    Surface(color = Color("#0D4390"), modifier = Modifier.fillMaxSize()) {
+    Surface(color = "#0D4390".toColor(), modifier = Modifier.fillMaxSize()) {
 
         Column(modifier = Modifier.padding(16.dp)) {
             Spacer(modifier = Modifier.height(90.dp))

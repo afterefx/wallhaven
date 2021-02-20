@@ -23,7 +23,6 @@ sealed class GalleryUserIntent {
 /**
  * The ViewModel acts upon these events accordingly by making API calls or saving/retrieving data in the database via the Repository layer.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 class GalleryStateChannel @Inject constructor(private val repository: WallHavenRepository) :
     StateChannel<GalleryViewState, GalleryUserIntent>(
         GalleryViewState()

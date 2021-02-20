@@ -5,5 +5,5 @@ import app.androiddev.wallhaven.ui.gallery.GalleryStateChannel
 import app.androiddev.wallhaven.ui.gallery.GalleryViewModel
 
 class LatestViewModel @ViewModelInject constructor(
-    private val stateChannel: GalleryStateChannel
+    stateChannel: GalleryStateChannel
 ) : GalleryViewModel(stateChannel)

@@ -11,12 +11,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import app.androiddev.wallhaven.extensions.Color
+import app.androiddev.wallhaven.extensions.toColor
 
 val DarkColorPalette = darkColors(
-    primary = Color("#232323"),
+    primary = "#232323".toColor(),
     onPrimary = androidx.compose.ui.graphics.Color.White,
-    primaryVariant = Color("#232323"),
+    primaryVariant = "#232323".toColor(),
     secondary = teal200
 )
 
@@ -60,7 +60,7 @@ fun DynamicTheme(colors: ColorState, content: @Composable () -> Unit) {
             colors.onColor,
             spring(stiffness = Spring.StiffnessLow)
         ).value,
-        background = Color("#121212"),
+        background = "#121212".toColor(),
         onBackground = Color.White
     )
     WallHavenTheme(colors = colors, content = content)

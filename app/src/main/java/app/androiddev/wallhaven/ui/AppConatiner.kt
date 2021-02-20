@@ -15,9 +15,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import app.androiddev.wallhaven.R
-import app.androiddev.wallhaven.extensions.Color
+import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.theme.ColorState
 import app.androiddev.wallhaven.theme.DarkColorPalette
 import app.androiddev.wallhaven.theme.DynamicTheme
@@ -58,7 +59,7 @@ fun AppContainer() {
         val scope = rememberCoroutineScope()
         scope.launch(Dispatchers.IO) {
             Thread.sleep(3000)
-            colors.updateColors(Color("#232323"), Color.White)
+            colors.updateColors("#232323".toColor(), Color.White)
         }
         Scaffold(
             topBar = {
@@ -165,7 +166,7 @@ fun TitleContent(
                     updateScreen(prev)
                 }) {
                     Icon(
-                        imageVector = vectorResource(id = R.drawable.ic_arrow_back),
+                        painter = painterResource(id = R.drawable.ic_arrow_back),
                         contentDescription = DETAILS
                     )
                 }

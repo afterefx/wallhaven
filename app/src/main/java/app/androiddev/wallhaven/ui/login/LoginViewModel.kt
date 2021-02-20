@@ -1,4 +1,4 @@
-package app.androiddev.wallhaven.ui
+package app.androiddev.wallhaven.ui.login
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel

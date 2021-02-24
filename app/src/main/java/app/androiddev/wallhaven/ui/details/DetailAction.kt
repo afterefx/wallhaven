@@ -1,7 +1,7 @@
 package app.androiddev.wallhaven.ui.details
 
 sealed class DetailMVOperation {
-    object GetWallpaper : DetailMVOperation()
+    class GetWallpaper(val id: String) : DetailMVOperation()
     object Loading : DetailMVOperation()
 }
 
@@ -9,11 +9,10 @@ class DetailAction {
     fun action(
         op: DetailMVOperation,
         detailsViewModel: WallPaperDetailsViewModel,
-        id: String = ""
     ) =
         when (op) {
-            DetailMVOperation.GetWallpaper -> detailsViewModel.userIntentChannel.offer(
-                DetailsUserIntent.GetWallpaper(id)
+            is DetailMVOperation.GetWallpaper -> detailsViewModel.userIntentChannel.offer(
+                DetailsUserIntent.GetWallpaper(op.id)
             )
             DetailMVOperation.Loading -> detailsViewModel.userIntentChannel.offer(DetailsUserIntent.Loading)
         }

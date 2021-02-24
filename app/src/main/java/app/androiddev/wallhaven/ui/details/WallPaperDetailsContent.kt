@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
+import app.androiddev.wallhaven.ui.AppContent
 import app.androiddev.wallhaven.ui.ScreenState
 import dev.chrisbanes.accompanist.coil.CoilImage
 import dev.chrisbanes.accompanist.imageloading.ImageLoadState
@@ -46,23 +47,26 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun WallPaperDetailsContent(
-    id: String,
-    updateScreen: (ScreenState) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val viewModel: WallPaperDetailsViewModel = viewModel()
-    val viewState: WallpaperDetailsViewState by viewModel.state.collectAsState()
-    val vmAction = DetailAction()
+fun WallPaperDetailsContent() {
+    AppContent { _, vs ->
+        val viewModel: WallPaperDetailsViewModel = viewModel()
+        val viewState: WallpaperDetailsViewState by viewModel.state.collectAsState()
+        val vmAction = DetailAction()
 
-    vmAction.action(op = DetailMVOperation.GetWallpaper, detailsViewModel = viewModel, id = id)
+        vmAction.action(
+            op = DetailMVOperation.GetWallpaper(
+                id = (vs.currentScreen as ScreenState.Detail).id
+            ),
+            detailsViewModel = viewModel,
+        )
 
-    if (viewState.loading) {
-        LoadingScreen()
-    } else {
-        val wallpaperDetails = viewState.wallpaperDetails
-        wallpaperDetails?.let {
-            ImageDetail(it)
+        if (viewState.loading) {
+            LoadingScreen()
+        } else {
+            val wallpaperDetails = viewState.wallpaperDetails
+            wallpaperDetails?.let {
+                ImageDetail(it)
+            }
         }
     }
 }

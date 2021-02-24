@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.androiddev.wallhaven.extensions.toColor
-import app.androiddev.wallhaven.ui.LoginViewModel
 
 @Composable
 fun LoginUi(saveApiToken: (String) -> Unit = {}) {

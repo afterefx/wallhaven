@@ -4,5 +4,5 @@ sealed class ScreenState {
     object Latest : ScreenState()
     object TopList : ScreenState()
     object Random : ScreenState()
-    object Detail : ScreenState()
+    class Detail(val id: String) : ScreenState()
 }

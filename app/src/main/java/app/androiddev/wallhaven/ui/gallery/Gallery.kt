@@ -34,7 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
+import app.androiddev.wallhaven.ui.AppContent
 import app.androiddev.wallhaven.ui.ScreenState
+import app.androiddev.wallhaven.ui.appcontainer.AppAction
+import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
 import dev.chrisbanes.accompanist.coil.CoilImage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -43,73 +46,76 @@ import kotlinx.coroutines.launch
 @Composable
 inline fun <reified T : GalleryViewModel> GalleryPage(
     operation: GalleryOperation,
-    noinline updateScreen: (ScreenState) -> Unit,
-    noinline updateId: (String) -> Unit,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    val viewModel: T = viewModel()
-    val state by viewModel.state.collectAsState()
-    val vmAction = GalleryAction()
+    AppContent { vm, _ ->
+        val viewModel: T = viewModel()
+        val state by viewModel.state.collectAsState()
+        val vmAction = GalleryAction()
 
-    if (!state.initialized) {
-        vmAction.action(
-            operation,
-            vm = viewModel,
-            page = 1
-        )
-    }
-
-    val scope = rememberCoroutineScope()
-    val prev = {
-        scope.launch {
-            lazyListState.snapToItemIndex(0)
+        if (!state.initialized) {
+            vmAction.action(
+                operation,
+                vm = viewModel,
+                page = 1
+            )
         }
-        val prevPage = state.page - 1
-        vmAction.action(
-            GalleryOperation.Loading,
-            vm = viewModel,
-            page = prevPage
-        )
-        vmAction.action(
-            operation,
-            vm = viewModel,
-            page = prevPage
-        )
-    }
-    val next = {
-        scope.launch {
-            lazyListState.snapToItemIndex(0)
-        }
-        val nextPage = state.page + 1
-        vmAction.action(
-            GalleryOperation.Loading,
-            vm = viewModel,
-            page = nextPage
-        )
-        vmAction.action(
-            operation,
-            vm = viewModel,
-            page = nextPage
-        )
-    }
 
-    Column {
-        PageButtons(page = state.page, onNext = next, onPrev = prev)
-        if (state.loading) {
-            LoadingScreen()
-        } else {
-            LazyVerticalGrid(cells = GridCells.Fixed(2), state = lazyListState) {
-                items(state.list ?: emptyList()) { wallpaper ->
-                    ThumbNail(
-                        wallpaper,
-                        Modifier.clickable(onClick = {
-                            updateId(wallpaper.id)
-                            updateScreen(ScreenState.Detail)
-                        })
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.height(120.dp))
+        val scope = rememberCoroutineScope()
+        val prev = {
+            scope.launch {
+                lazyListState.snapToItemIndex(0)
+            }
+            val prevPage = state.page - 1
+            vmAction.action(
+                GalleryOperation.Loading,
+                vm = viewModel,
+                page = prevPage
+            )
+            vmAction.action(
+                operation,
+                vm = viewModel,
+                page = prevPage
+            )
+        }
+        val next = {
+            scope.launch {
+                lazyListState.snapToItemIndex(0)
+            }
+            val nextPage = state.page + 1
+            vmAction.action(
+                GalleryOperation.Loading,
+                vm = viewModel,
+                page = nextPage
+            )
+            vmAction.action(
+                operation,
+                vm = viewModel,
+                page = nextPage
+            )
+        }
+
+        Column {
+            PageButtons(page = state.page, onNext = next, onPrev = prev)
+            if (state.loading) {
+                LoadingScreen()
+            } else {
+                LazyVerticalGrid(cells = GridCells.Fixed(2), state = lazyListState) {
+                    items(state.list ?: emptyList()) { wallpaper ->
+                        ThumbNail(
+                            wallpaper,
+                            Modifier.clickable(onClick = {
+                                AppAction.action(
+                                    AppVmOperation.ChangeScreen(
+                                        ScreenState.Detail(wallpaper.id)
+                                    ), vm
+                                )
+                            })
+                        )
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(120.dp))
+                    }
                 }
             }
         }

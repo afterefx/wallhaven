@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,15 +35,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
-import app.androiddev.wallhaven.ui.AppContent
+import app.androiddev.wallhaven.ui.appcontainer.AppContent
 import app.androiddev.wallhaven.ui.ScreenState
 import app.androiddev.wallhaven.ui.appcontainer.AppAction
 import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
 import dev.chrisbanes.accompanist.coil.CoilImage
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 inline fun <reified T : GalleryViewModel> GalleryPage(
     operation: GalleryOperation,
@@ -64,7 +64,7 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
         val scope = rememberCoroutineScope()
         val prev = {
             scope.launch {
-                lazyListState.snapToItemIndex(0)
+                lazyListState.scrollToItem(0)
             }
             val prevPage = state.page - 1
             vmAction.action(
@@ -80,7 +80,7 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
         }
         val next = {
             scope.launch {
-                lazyListState.snapToItemIndex(0)
+                lazyListState.scrollToItem(0)
             }
             val nextPage = state.page + 1
             vmAction.action(
@@ -100,7 +100,11 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
             if (state.loading) {
                 LoadingScreen()
             } else {
-                LazyVerticalGrid(cells = GridCells.Fixed(2), state = lazyListState) {
+                LazyVerticalGrid(
+                    cells = GridCells.Fixed(2),
+                    state = lazyListState,
+                    contentPadding = PaddingValues(bottom = 100.dp),
+                ) {
                     items(state.list ?: emptyList()) { wallpaper ->
                         ThumbNail(
                             wallpaper,
@@ -112,9 +116,6 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
                                 )
                             })
                         )
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(120.dp))
                     }
                 }
             }

@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import app.androiddev.wallhaven.ui.AppContent
+import app.androiddev.wallhaven.ui.appcontainer.AppContent
 import app.androiddev.wallhaven.ui.ScreenState
 import app.androiddev.wallhaven.ui.appcontainer.AppAction
 import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
@@ -26,27 +26,27 @@ fun RandomContent() {
         val lazyListState = vs.randomListState ?: rememberLazyListState()
         val operation = GalleryOperation.GetRandomListPage
 
-        val viewmodel: RandomViewModel = viewModel()
-        val state by viewmodel.state.collectAsState()
+        val viewModel: RandomViewModel = viewModel()
+        val state by viewModel.state.collectAsState()
         val vmAction = GalleryAction()
 
         if (!state.initialized) {
-            vmAction.action(op = operation, vm = viewmodel)
+            vmAction.action(op = operation, vm = viewModel)
         }
 
         val scope = rememberCoroutineScope()
         Column {
             RefreshButton {
                 scope.launch {
-                    lazyListState.snapToItemIndex(0)
+                    lazyListState.scrollToItem(0)
                 }
                 vmAction.action(
                     GalleryOperation.Loading,
-                    viewmodel
+                    viewModel
                 )
                 vmAction.action(
                     operation,
-                    viewmodel
+                    viewModel
                 )
             }
             if (state.loading) {

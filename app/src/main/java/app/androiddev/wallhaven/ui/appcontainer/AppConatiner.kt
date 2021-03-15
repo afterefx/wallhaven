@@ -1,4 +1,4 @@
-package app.androiddev.wallhaven.ui
+package app.androiddev.wallhaven.ui.appcontainer
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -21,10 +21,7 @@ import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.theme.ColorState
 import app.androiddev.wallhaven.theme.DarkColorPalette
 import app.androiddev.wallhaven.theme.DynamicTheme
-import app.androiddev.wallhaven.ui.appcontainer.AppAction
-import app.androiddev.wallhaven.ui.appcontainer.AppContainerViewModel
-import app.androiddev.wallhaven.ui.appcontainer.AppContainerViewState
-import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
+import app.androiddev.wallhaven.ui.ScreenState
 import app.androiddev.wallhaven.ui.details.WallPaperDetailsContent
 import app.androiddev.wallhaven.ui.latest.LatestContent
 import app.androiddev.wallhaven.ui.random.RandomContent
@@ -39,53 +36,48 @@ const val RANDOM = "Random"
 const val TOP = "Top"
 const val TOP_LIST = "Top List"
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun AppContainer() {
-    val appContainerViewModel: AppContainerViewModel = viewModel()
-    val activityViewState by appContainerViewModel.state.collectAsState()
-    var currentScreen = activityViewState.currentScreen
-    var previousScreen = activityViewState.previousScreens
+    AppContent { _, vs ->
+        val colors = remember { ColorState(DarkColorPalette.primary, DarkColorPalette.onPrimary) }
 
-    val colors = remember { ColorState(DarkColorPalette.primary, DarkColorPalette.onPrimary) }
-
-
-    DynamicTheme(colors = colors) {
-        val scope = rememberCoroutineScope()
-        scope.launch(Dispatchers.IO) {
-            Thread.sleep(3000)
-            colors.updateColors("#232323".toColor(), Color.White)
-        }
-        Scaffold(
-            topBar = { TitleContent() },
-            bodyContent = {
-                when (currentScreen) {
-                    ScreenState.Latest -> {
-                        LatestContent()
-                    }
-                    is ScreenState.Detail -> {
-                        WallPaperDetailsContent()
-                    }
-                    ScreenState.TopList -> {
-                        TopList()
-                    }
-                    ScreenState.Random -> {
-                        RandomContent()
-                    }
-                }
-            },
-            bottomBar = {
-                when (currentScreen) {
-                    ScreenState.Latest,
-                    ScreenState.TopList,
-                    ScreenState.Random ->
-                        BottomNavigation()
-                    is ScreenState.Detail -> {
-                        //no bottom bar
-                    }
-                }
+        DynamicTheme(colors = colors) {
+            val scope = rememberCoroutineScope()
+            scope.launch(Dispatchers.IO) {
+                Thread.sleep(3000)
+                colors.updateColors("#232323".toColor(), Color.White)
             }
-        )
+            Scaffold(
+                topBar = { TitleContent() },
+                content = {
+                    when (vs.currentScreen) {
+                        ScreenState.Latest -> {
+                            LatestContent()
+                        }
+                        is ScreenState.Detail -> {
+                            WallPaperDetailsContent()
+                        }
+                        ScreenState.TopList -> {
+                            TopList()
+                        }
+                        ScreenState.Random -> {
+                            RandomContent()
+                        }
+                    }
+                },
+                bottomBar = {
+                    when (vs.currentScreen) {
+                        ScreenState.Latest,
+                        ScreenState.TopList,
+                        ScreenState.Random ->
+                            BottomNavigation()
+                        is ScreenState.Detail -> {
+                            //no bottom bar
+                        }
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -135,7 +127,6 @@ fun RowScope.NavigationIcon(
             }
         )
     }
-
 }
 
 @Composable

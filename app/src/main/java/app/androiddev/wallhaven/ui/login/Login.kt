@@ -1,17 +1,28 @@
 package app.androiddev.wallhaven.ui.login
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.*
+import androidx.compose.material.TextFieldDefaults.textFieldColors
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,17 +43,19 @@ fun LoginUi(saveApiToken: (String) -> Unit = {}) {
                 fontSize = 60.sp
             )
             Spacer(modifier = Modifier.height(90.dp))
-            var username by remember { mutableStateOf(TextFieldValue("")) }
-            var password by remember { mutableStateOf(TextFieldValue("")) }
+            var username by remember { mutableStateOf("") }
+            var password by remember { mutableStateOf("") }
 
             TextField(
                 value = username,
-                onValueChange = { s: TextFieldValue -> username = s },
-                label = @Composable { Text(text = "Username") },
+                onValueChange = { username = it },
+                label = { Text("Username") },
                 shape = MaterialTheme.shapes.medium,
-                backgroundColor = Color.White,
-                activeColor = Color.Black,
-                inactiveColor = Color.Black,
+                colors = textFieldColors(
+                    backgroundColor = Color.White,
+                    textColor = Color.Black,
+                    disabledTextColor = Color.Black
+                ),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -50,19 +63,21 @@ fun LoginUi(saveApiToken: (String) -> Unit = {}) {
 
             TextField(
                 value = password,
-                onValueChange = { s: TextFieldValue -> password = s },
-                label = @Composable { Text(text = "Password") },
+                onValueChange = { password = it },
+                label = { Text(text = "Password") },
                 shape = MaterialTheme.shapes.medium,
                 visualTransformation = PasswordVisualTransformation(),
-                backgroundColor = Color.White,
-                activeColor = Color.Black,
-                inactiveColor = Color.Black,
+                colors = textFieldColors(
+                    backgroundColor = Color.White,
+                    textColor = Color.Black,
+                    disabledTextColor = Color.Black
+                ),
                 modifier = Modifier.fillMaxWidth()
             )
 
             val vm: LoginViewModel = viewModel()
             val onSubmit = {
-                vm.doLogin(username.text, password.text, saveApiToken)
+                vm.doLogin(username, password, saveApiToken)
             }
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {

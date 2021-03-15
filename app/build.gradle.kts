@@ -63,8 +63,6 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.2.0")
     implementation("androidx.fragment:fragment-ktx:1.3.0")
 
-    // COMPOSE
-    implementation("androidx.compose.animation:animation:$composeVersion")
     implementation("androidx.compose.ui:ui:$composeVersion")
     // Tooling support (Previews, etc.)
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
@@ -72,25 +70,30 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:$composeVersion")
     // Material Design
     implementation("androidx.compose.material:material:$composeVersion")
-    // Material design icons)
+    // Material design icons
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
+    // Integration with activities
+    implementation("androidx.activity:activity-compose:1.3.0-alpha03")
+    // Integration with ViewModels
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha02")
     // Integration with observables
     implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
     implementation("androidx.compose.runtime:runtime-rxjava2:$composeVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha01")
-    implementation("androidx.activity:activity-compose:1.3.0-alpha02")
-    implementation("androidx.paging:paging-compose:1.0.0-alpha07")
 
     // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha01")
+    implementation("androidx.activity:activity-compose:1.3.0-alpha03")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha07")
 
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
     implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
 
     // Coil/Accompanist
-    implementation("dev.chrisbanes.accompanist:accompanist-coil:0.5.1")
+    implementation("dev.chrisbanes.accompanist:accompanist-coil:0.6.0")
 
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.28.3-alpha")

@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import app.androiddev.wallhaven.R
+import app.androiddev.wallhaven.ui.appcontainer.AppContainer
 import app.androiddev.wallhaven.ui.login.LoginUi
 
 @Composable

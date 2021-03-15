@@ -1,54 +1,66 @@
 package app.androiddev.wallhaven.ui.details
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animate
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.rememberZoomableController
-import androidx.compose.foundation.gestures.zoomable
+import androidx.compose.foundation.gestures.detectTransformGestures
+//import androidx.compose.foundation.gestures.rememberZoomableController
+//import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.dragGestureFilter
+import androidx.compose.ui.draw.clipToBounds
+//import androidx.compose.ui.gesture.DragObserver
+//import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
-import app.androiddev.wallhaven.ui.AppContent
+import app.androiddev.wallhaven.ui.appcontainer.AppContent
 import app.androiddev.wallhaven.ui.ScreenState
+import app.androiddev.wallhaven.ui.appcontainer.AppAction
+import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
 import dev.chrisbanes.accompanist.coil.CoilImage
 import dev.chrisbanes.accompanist.imageloading.ImageLoadState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun WallPaperDetailsContent() {
-    AppContent { _, vs ->
+    AppContent { vm, vs ->
         val viewModel: WallPaperDetailsViewModel = viewModel()
         val viewState: WallpaperDetailsViewState by viewModel.state.collectAsState()
         val vmAction = DetailAction()
@@ -59,6 +71,8 @@ fun WallPaperDetailsContent() {
             ),
             detailsViewModel = viewModel,
         )
+
+        BackHandler(onBack = { AppAction.action(AppVmOperation.Back, vm) })
 
         if (viewState.loading) {
             LoadingScreen()
@@ -86,73 +100,94 @@ fun LoadingScreen() {
 fun ImageDetail(wallpaperDetails: WallpaperDetails) {
     val config = LocalConfiguration.current
     val screenWidth = config.screenWidthDp
-    var scale by remember { mutableStateOf(1f) }
-    val zoomableController =
-        rememberZoomableController { if (scale >= 1f) scale *= it else scale = 1f }
-    var xOffset by remember { mutableStateOf(0f) }
-    var yOffset by remember { mutableStateOf(0f) }
-    val panned = (xOffset != 0f || yOffset != 0f)
-    val zoomedIn = scale > 1f
+    var zoom by remember { mutableStateOf(1f) }
+    val panMinX by remember { derivedStateOf { ((392f - (392 * zoom)) / 2) } }
+    val panMaxX = 0f
+    var offsetX by remember { mutableStateOf(0f) }
+    var offsetY by remember { mutableStateOf(0f) }
+    val panned = (offsetX != 0f || offsetY != 0f)
+    val zoomedIn = zoom > 1f
     var origImageWidth by remember { mutableStateOf(0f) }
     var origImageHeight by remember { mutableStateOf(0f) }
     var imageDisplayedWidth by remember { mutableStateOf(0f) }
     var imageDisplayedHeight by remember { mutableStateOf(0f) }
 
+    val scope = rememberCoroutineScope()
     LazyColumn(modifier = Modifier
         .fillMaxSize()
-//        .clickable(
         .combinedClickable(
             onDoubleClick = {
+                var end = 0f
                 if (panned || zoomedIn) {
-                    scale = 1f
-                    xOffset = 0f
-                    yOffset = 0f
+                    end = 1f
+                    offsetX = 0f
+                    offsetY = 0f
+                } else {
+                    end = 2f
                 }
-
+                scope.launch {
+                    animate(zoom, end) { value, _ ->
+                        zoom = value
+                    }
+                }
             },
             onClick = {}
         )
-        .zoomable(zoomableController)
     ) {
         item {
             wallpaperDetails.let { data ->
                 Column(modifier = Modifier.fillMaxHeight()) {
 
-                    Spacer(modifier = Modifier.preferredHeight(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     Box(
                         Modifier
-                            .dragGestureFilter(object : DragObserver {
-                                override fun onDrag(dragDistance: Offset): Offset {
-                                    xOffset += (dragDistance.x * 0.6f)
-                                    yOffset += (dragDistance.y * 0.6f)
-                                    return dragDistance
+                            .pointerInput(Unit) {
+                                detectTransformGestures { _, p, z, _ ->
+//                                    if (zoom >= 1f) zoom *= z else zoom = 1f
+                                    offsetX += p.x
+                                    offsetY += p.y
+                                    if (offsetX < panMinX) {
+                                        offsetX = panMinX
+                                    } else if (offsetX > panMaxX) {
+                                        offsetX = panMaxX
+                                    }
                                 }
-                            })
-                            .fillMaxSize()
+                            }
                     ) {
+                        var statusText by remember { mutableStateOf("") }
+                        var showLoading by remember { mutableStateOf(false) }
+                        if (showLoading) {
+                            CircularProgressIndicator()
+                        }
+                        if (statusText.isNotEmpty()) {
+                            Text(statusText)
+                        }
                         CoilImage(
                             data = data.path,
                             contentDescription = null,
                             modifier = Modifier
-                                .fillMaxSize()
-                                .graphicsLayer(scaleX = scale, scaleY = scale)
-//                                    .offset(x = xOffset.dp, y = yOffset.dp)
-                                .offset(
-                                    x = xOffset.coerceIn(
-                                        minimumValue = if (zoomedIn) 0f - ((imageDisplayedWidth * scale) / 2) else 0f,
-                                        maximumValue = 0f
-                                    ).dp,
-                                    y = yOffset.coerceIn(
-                                        minimumValue = if (zoomedIn) 0f - ((imageDisplayedHeight * scale) / 2) else 0f,
-                                        maximumValue = 0f
-                                    ).dp
-                                ),
+                                .clipToBounds()
+                                .graphicsLayer(scaleX = zoom, scaleY = zoom)
+                                .offset {
+                                    IntOffset(
+                                        offsetX
+                                            .coerceIn(panMinX..0f)
+                                            .roundToInt(),
+                                        offsetY
+                                            .roundToInt()
+                                    )
+                                },
                             onRequestCompleted = {
                                 when (it) {
-                                    ImageLoadState.Empty -> TODO()
-                                    ImageLoadState.Loading -> TODO()
+                                    ImageLoadState.Empty -> {
+                                        statusText = "Empty"
+                                        showLoading = true
+                                    }
+                                    ImageLoadState.Loading -> showLoading = true
                                     is ImageLoadState.Success -> {
+                                        statusText = ""
+                                        showLoading = false
                                         origImageWidth = //it.image?.width?.toFloat() ?: 0f
                                             it.painter.intrinsicSize.width
                                         origImageHeight = //it.image?.height?.toFloat() ?: 0f
@@ -162,38 +197,44 @@ fun ImageDetail(wallpaperDetails: WallpaperDetails) {
                                         imageDisplayedHeight =
                                             (screenWidth / origImageWidth) * origImageHeight
                                     }
-                                    is ImageLoadState.Error -> TODO()
+                                    is ImageLoadState.Error -> {
+                                        statusText = "Error"
+                                        showLoading = true
+                                    }
                                 }
                             }
                         )
                     }
-                    Column {
-                        TextLabel(label = "screenWidthDp", content = screenWidth.toString())
-                        TextLabel(label = "origWidth", content = origImageWidth.toString())
-                        TextLabel(label = "origHeight", content = origImageHeight.toString())
-                        TextLabel(label = "width", content = imageDisplayedWidth.toString())
-                        TextLabel(label = "height", content = imageDisplayedHeight.toString())
-                        TextLabel("Scale", scale.toString())
-                        TextLabel("xOffset", xOffset.toString())
-                        TextLabel(label = "yOffset", content = yOffset.toString())
-                        TextLabel("xOffsetDp", xOffset.dp.toString())
-                        TextLabel(label = "yOffsetDp", content = yOffset.dp.toString())
-                        TextLabel(
-                            label = "minX",
-                            content = (0f - ((imageDisplayedWidth * scale) / 2)).toString()
-                        )
-                        TextLabel(
-                            label = "minY",
-                            content = (0f - ((imageDisplayedHeight * scale) / 2)).toString()
-                        )
-
-
+                    if (true) {
+                        Column {
+                            TextLabel(label = "screenWidthDp", content = screenWidth.toString())
+                            TextLabel(label = "origWidth", content = origImageWidth.toString())
+                            TextLabel(label = "origHeight", content = origImageHeight.toString())
+                            TextLabel(label = "width", content = imageDisplayedWidth.toString())
+                            TextLabel(label = "height", content = imageDisplayedHeight.toString())
+                            TextLabel("Scale", zoom.toString())
+                            TextLabel("xOffset", offsetX.roundToInt().toString())
+                            TextLabel(label = "yOffset", content = offsetY.roundToInt().toString())
+                            TextLabel("xOffsetDp", offsetX.roundToInt().dp.toString())
+                            TextLabel(
+                                label = "yOffsetDp",
+                                content = offsetY.roundToInt().dp.toString()
+                            )
+                            TextLabel(
+                                label = "minX",
+                                content = (0f - ((imageDisplayedWidth * zoom) / 2)).toString()
+                            )
+                            TextLabel(
+                                label = "minY",
+                                content = (0f - ((imageDisplayedHeight * zoom) / 2)).toString()
+                            )
+                        }
                     }
 
-                    if (scale <= 1f) {
+                    if (zoom <= 1f) {
                         Column(modifier = Modifier.padding(24.dp)) {
 
-                            Spacer(modifier = Modifier.preferredHeight(8.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
                             Label(text = "Category: ") {
                                 Text(text = data.category, style = MaterialTheme.typography.body1)

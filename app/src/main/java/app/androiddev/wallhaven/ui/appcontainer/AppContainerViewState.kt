@@ -1,8 +1,6 @@
 package app.androiddev.wallhaven.ui.appcontainer
 
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
-import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.ScreenState
 import app.androiddev.wallhaven.ui.WallHavenRepository
 import app.androiddev.wallhaven.util.StateChannel

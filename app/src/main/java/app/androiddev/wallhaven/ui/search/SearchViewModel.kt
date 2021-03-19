@@ -8,10 +8,13 @@ import androidx.lifecycle.viewModelScope
 import app.androiddev.wallhaven.model.wallhavendata.SearchQuery
 import app.androiddev.wallhaven.model.wallhavendata.SearchResults
 import app.androiddev.wallhaven.ui.WallHavenRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-class SearchViewModel @ViewModelInject constructor(
+@HiltViewModel
+class SearchViewModel @Inject constructor(
     private val wallHavenRepository: WallHavenRepository
 ) : ViewModel() {
 

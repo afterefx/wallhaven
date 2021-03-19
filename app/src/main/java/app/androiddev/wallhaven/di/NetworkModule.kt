@@ -7,8 +7,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
@@ -21,7 +21,7 @@ import javax.inject.Named
 /**
  * Module which provides all required dependencies about network
  */
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 @Module
 @Suppress("unused")
 object NetworkModule {
@@ -74,7 +74,7 @@ object NetworkModule {
     }
 }
 
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 @Module
 @Suppress("unused")
 object LoginModule {

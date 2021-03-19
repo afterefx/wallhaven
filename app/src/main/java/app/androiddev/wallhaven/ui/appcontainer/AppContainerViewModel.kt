@@ -3,9 +3,12 @@ package app.androiddev.wallhaven.ui.appcontainer
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AppContainerViewModel @ViewModelInject constructor(
+@HiltViewModel
+class AppContainerViewModel @Inject constructor(
     private val containerStateChannel: AppContainerStateChannel,
 ) : ViewModel() {
 

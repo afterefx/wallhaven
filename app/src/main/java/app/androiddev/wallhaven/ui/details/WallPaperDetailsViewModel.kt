@@ -3,9 +3,12 @@ package app.androiddev.wallhaven.ui.details
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WallPaperDetailsViewModel @ViewModelInject constructor(
+@HiltViewModel
+class WallPaperDetailsViewModel @Inject constructor(
     private val detailsStateChannel: DetailsStateChannel,
 ) : ViewModel() {
 

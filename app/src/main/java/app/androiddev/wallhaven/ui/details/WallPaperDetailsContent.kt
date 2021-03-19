@@ -49,8 +49,6 @@ import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.appcontainer.AppContent
 import app.androiddev.wallhaven.ui.ScreenState
-import app.androiddev.wallhaven.ui.appcontainer.AppAction
-import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
 import dev.chrisbanes.accompanist.coil.CoilImage
 import dev.chrisbanes.accompanist.imageloading.ImageLoadState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -72,7 +70,7 @@ fun WallPaperDetailsContent() {
             detailsViewModel = viewModel,
         )
 
-        BackHandler(onBack = { AppAction.action(AppVmOperation.Back, vm) })
+        BackHandler(onBack = { vm.goBack() })
 
         if (viewState.loading) {
             LoadingScreen()

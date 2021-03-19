@@ -13,8 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.androiddev.wallhaven.ui.appcontainer.AppContent
 import app.androiddev.wallhaven.ui.ScreenState
-import app.androiddev.wallhaven.ui.appcontainer.AppAction
-import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
 import app.androiddev.wallhaven.ui.gallery.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -57,13 +55,7 @@ fun RandomContent() {
                         ThumbNail(
                             wallpaper,
                             Modifier.clickable(onClick = {
-                                AppAction.action(
-                                    AppVmOperation.ChangeScreen(
-                                        ScreenState.Detail(
-                                            wallpaper.id
-                                        )
-                                    ), vm
-                                )
+                                vm.navigate(ScreenState.Detail(wallpaper.id))
                             })
                         )
                     }

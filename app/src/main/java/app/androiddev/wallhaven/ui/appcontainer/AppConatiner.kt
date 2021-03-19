@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import app.androiddev.wallhaven.R
 import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.theme.ColorState
@@ -26,6 +25,8 @@ import app.androiddev.wallhaven.ui.details.WallPaperDetailsContent
 import app.androiddev.wallhaven.ui.latest.LatestContent
 import app.androiddev.wallhaven.ui.random.RandomContent
 import app.androiddev.wallhaven.ui.toplist.TopList
+import com.airbnb.mvrx.compose.collectAsState
+import com.airbnb.mvrx.compose.mavericksViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -116,9 +117,7 @@ fun RowScope.NavigationIcon(
         BottomNavigationItem(
             selected = vs.currentScreen == screen,
             label = { Text(text = label) },
-            onClick = {
-                AppAction.action(AppVmOperation.ChangeScreen(screen), vm)
-            },
+            onClick = { vm.navigate(screen) },
             icon = {
                 Icon(
                     imageVector = icon,
@@ -139,7 +138,7 @@ fun TitleContent() {
             is ScreenState.Detail -> {
                 TopAppBar(DETAILS) {
                     IconButton(onClick = {
-                        AppAction.action(AppVmOperation.Back, vm)
+                        vm.goBack()
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_arrow_back),
@@ -168,20 +167,17 @@ fun AppContent(
         appViewState: AppContainerViewState,
     ) -> Unit
 ) {
-    val vm: AppContainerViewModel = viewModel()
-    val appViewState by vm.state.collectAsState()
+    val vm: AppContainerViewModel = mavericksViewModel()
+    val appViewState by vm.collectAsState()
 
     if (appViewState.latestListState == null
         || appViewState.topListState == null
         || appViewState.randomListState == null
     ) {
-        AppAction.action(
-            AppVmOperation.InitializeListStates(
-                latest = rememberLazyListState(),
-                top = rememberLazyListState(),
-                random = rememberLazyListState()
-            ),
-            vm
+        vm.initializeListStates(
+            latest = rememberLazyListState(),
+            top = rememberLazyListState(),
+            random = rememberLazyListState()
         )
     }
     content(vm, appViewState)

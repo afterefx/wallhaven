@@ -94,6 +94,9 @@ dependencies {
     // Coil/Accompanist
     implementation("dev.chrisbanes.accompanist:accompanist-coil:0.6.0")
 
+    // Mavericks
+    implementation("com.airbnb.android:mavericks-compose:2.1.0-alpha01")
+
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")

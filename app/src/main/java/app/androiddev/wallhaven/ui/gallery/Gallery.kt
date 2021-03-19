@@ -37,8 +37,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.appcontainer.AppContent
 import app.androiddev.wallhaven.ui.ScreenState
-import app.androiddev.wallhaven.ui.appcontainer.AppAction
-import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
 import dev.chrisbanes.accompanist.coil.CoilImage
 import kotlinx.coroutines.launch
 
@@ -109,11 +107,7 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
                         ThumbNail(
                             wallpaper,
                             Modifier.clickable(onClick = {
-                                AppAction.action(
-                                    AppVmOperation.ChangeScreen(
-                                        ScreenState.Detail(wallpaper.id)
-                                    ), vm
-                                )
+                                vm.navigate(ScreenState.Detail(wallpaper.id))
                             })
                         )
                     }

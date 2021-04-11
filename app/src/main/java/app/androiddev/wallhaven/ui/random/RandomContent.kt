@@ -10,23 +10,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import app.androiddev.wallhaven.ui.appcontainer.AppContent
-import app.androiddev.wallhaven.ui.ScreenState
-import app.androiddev.wallhaven.ui.appcontainer.AppAction
-import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
 import app.androiddev.wallhaven.ui.gallery.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun RandomContent() {
+fun RandomContent(navController: NavController) {
     AppContent { vm, vs ->
         val lazyListState = vs.randomListState ?: rememberLazyListState()
         val operation = GalleryOperation.GetRandomListPage
 
-        val viewModel: RandomViewModel = viewModel()
+        val viewModel: RandomViewModel = hiltViewModel()
         val state by viewModel.state.collectAsState()
         val vmAction = GalleryAction()
 
@@ -57,13 +55,7 @@ fun RandomContent() {
                         ThumbNail(
                             wallpaper,
                             Modifier.clickable(onClick = {
-                                AppAction.action(
-                                    AppVmOperation.ChangeScreen(
-                                        ScreenState.Detail(
-                                            wallpaper.id
-                                        )
-                                    ), vm
-                                )
+                                navController.navigate("detail/${wallpaper.id}")
                             })
                         )
                     }

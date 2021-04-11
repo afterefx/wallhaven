@@ -3,11 +3,10 @@ package app.androiddev.wallhaven.ui.details
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animate
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTransformGestures
-//import androidx.compose.foundation.gestures.rememberZoomableController
-//import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
@@ -33,8 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-//import androidx.compose.ui.gesture.DragObserver
-//import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
@@ -44,43 +42,40 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
-import app.androiddev.wallhaven.ui.appcontainer.AppContent
-import app.androiddev.wallhaven.ui.ScreenState
-import app.androiddev.wallhaven.ui.appcontainer.AppAction
-import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
-import dev.chrisbanes.accompanist.coil.CoilImage
-import dev.chrisbanes.accompanist.imageloading.ImageLoadState
+import app.androiddev.wallhaven.ui.Screen
+import coil.compose.ImagePainter
+import coil.compose.ImagePainter.State.Empty.painter
+import coil.compose.rememberImagePainter
+import coil.decode.DataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun WallPaperDetailsContent() {
-    AppContent { vm, vs ->
-        val viewModel: WallPaperDetailsViewModel = viewModel()
-        val viewState: WallpaperDetailsViewState by viewModel.state.collectAsState()
-        val vmAction = DetailAction()
+fun WallPaperDetailsContent(navController: NavController, id: String) {
+    if (id.isNullOrEmpty()) navController.navigate(Screen.Latest.route)
+    val viewModel: WallPaperDetailsViewModel = hiltViewModel()
+    val viewState: WallpaperDetailsViewState by viewModel.state.collectAsState()
+    val vmAction = DetailAction()
 
-        vmAction.action(
-            op = DetailMVOperation.GetWallpaper(
-                id = (vs.currentScreen as ScreenState.Detail).id
-            ),
-            detailsViewModel = viewModel,
-        )
+    vmAction.action(
+        op = DetailMVOperation.GetWallpaper(id = id),
+        detailsViewModel = viewModel,
+    )
 
-        BackHandler(onBack = { AppAction.action(AppVmOperation.Back, vm) })
+    BackHandler(onBack = { navController.popBackStack() })
 
-        if (viewState.loading) {
-            LoadingScreen()
-        } else {
-            val wallpaperDetails = viewState.wallpaperDetails
-            wallpaperDetails?.let {
-                ImageDetail(it)
-            }
+    if (viewState.loading) {
+        LoadingScreen()
+    } else {
+        val wallpaperDetails = viewState.wallpaperDetails
+        wallpaperDetails?.let {
+            ImageDetail(it)
         }
     }
 }
@@ -157,14 +152,44 @@ fun ImageDetail(wallpaperDetails: WallpaperDetails) {
                     ) {
                         var statusText by remember { mutableStateOf("") }
                         var showLoading by remember { mutableStateOf(false) }
+                        val imagepainter = rememberImagePainter(data.path)
+
+                        when (imagepainter.state) {
+                            is ImagePainter.State.Success -> {
+                                // Perform the transition animation.
+                                statusText = ""
+                                showLoading = false
+                                origImageWidth = //it.image?.width?.toFloat() ?: 0f
+                                    imagepainter.intrinsicSize.width
+                                origImageHeight = //it.image?.height?.toFloat() ?: 0f
+                                    imagepainter.intrinsicSize.height
+                                imageDisplayedWidth =
+                                    (screenWidth / origImageWidth) * origImageWidth
+                                imageDisplayedHeight =
+                                    (screenWidth / origImageWidth) * origImageHeight
+                            }
+                            ImagePainter.State.Empty -> {
+                                statusText = "Empty"
+                                showLoading = true
+                            }
+                            is ImagePainter.State.Loading -> {
+                                showLoading = true
+                            }
+                            is ImagePainter.State.Error -> {
+                                statusText = "Error"
+                                showLoading = true
+                            }
+                        }
+//                        if (state is ImagePainter.State.Success && state.metadata.dataSource != DataSource.MEMORY_CACHE ) { }
+
                         if (showLoading) {
                             CircularProgressIndicator()
                         }
                         if (statusText.isNotEmpty()) {
                             Text(statusText)
                         }
-                        CoilImage(
-                            data = data.path,
+                        Image(
+                            painter = imagepainter,
                             contentDescription = null,
                             modifier = Modifier
                                 .clipToBounds()
@@ -177,32 +202,7 @@ fun ImageDetail(wallpaperDetails: WallpaperDetails) {
                                         offsetY
                                             .roundToInt()
                                     )
-                                },
-                            onRequestCompleted = {
-                                when (it) {
-                                    ImageLoadState.Empty -> {
-                                        statusText = "Empty"
-                                        showLoading = true
-                                    }
-                                    ImageLoadState.Loading -> showLoading = true
-                                    is ImageLoadState.Success -> {
-                                        statusText = ""
-                                        showLoading = false
-                                        origImageWidth = //it.image?.width?.toFloat() ?: 0f
-                                            it.painter.intrinsicSize.width
-                                        origImageHeight = //it.image?.height?.toFloat() ?: 0f
-                                            it.painter.intrinsicSize.height
-                                        imageDisplayedWidth =
-                                            (screenWidth / origImageWidth) * origImageWidth
-                                        imageDisplayedHeight =
-                                            (screenWidth / origImageWidth) * origImageHeight
-                                    }
-                                    is ImageLoadState.Error -> {
-                                        statusText = "Error"
-                                        showLoading = true
-                                    }
                                 }
-                            }
                         )
                     }
                     if (true) {

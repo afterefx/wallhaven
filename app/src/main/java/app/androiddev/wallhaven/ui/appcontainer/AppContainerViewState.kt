@@ -1,7 +1,7 @@
 package app.androiddev.wallhaven.ui.appcontainer
 
 import androidx.compose.foundation.lazy.LazyListState
-import app.androiddev.wallhaven.ui.ScreenState
+import app.androiddev.wallhaven.ui.Screen
 import app.androiddev.wallhaven.ui.WallHavenRepository
 import app.androiddev.wallhaven.util.StateChannel
 import java.util.*
@@ -9,9 +9,9 @@ import javax.inject.Inject
 
 data class AppContainerViewState(
     val loading: Boolean = true,
-    val currentScreen: ScreenState = ScreenState.Latest,
+    val currentScreen: Screen = Screen.Latest,
     val wallpaperDetailId: String? = null,
-    val previousScreens: Stack<ScreenState>? = null,
+    val previousScreens: Stack<Screen>? = null,
     val latestListState: LazyListState? = null,
     val topListState: LazyListState? = null,
     val randomListState: LazyListState? = null,
@@ -22,7 +22,7 @@ data class AppContainerViewState(
  * passed on to the ViewModel.  These Events are modelled as a sealed class.
  */
 sealed class AppUserIntent {
-    data class ChangeScreen(val screen: ScreenState) : AppUserIntent()
+    data class ChangeScreen(val screen: Screen) : AppUserIntent()
     object Loading : AppUserIntent()
     object PreviousScreen : AppUserIntent()
     class InitializeListStates(
@@ -44,7 +44,7 @@ class AppContainerStateChannel @Inject constructor(
     ): AppContainerViewState =
         when (userIntent) {
             is AppUserIntent.ChangeScreen -> {
-                val stack: Stack<ScreenState> = _state.value.previousScreens ?: Stack()
+                val stack: Stack<Screen> = _state.value.previousScreens ?: Stack()
                 stack.add(_state.value.currentScreen)
                 _state.value.copy(
                     loading = false,
@@ -65,8 +65,8 @@ class AppContainerStateChannel @Inject constructor(
                 )
             }
             AppUserIntent.PreviousScreen -> {
-                val prevScreen: ScreenState =
-                    _state.value.previousScreens?.pop() ?: ScreenState.Latest
+                val prevScreen: Screen =
+                    _state.value.previousScreens?.pop() ?: Screen.Latest
                 _state.value.copy(
                     currentScreen = prevScreen,
                     wallpaperDetailId = null,

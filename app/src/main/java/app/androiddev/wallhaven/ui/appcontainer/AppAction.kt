@@ -1,12 +1,12 @@
 package app.androiddev.wallhaven.ui.appcontainer
 
 import androidx.compose.foundation.lazy.LazyListState
-import app.androiddev.wallhaven.ui.ScreenState
+import app.androiddev.wallhaven.ui.Screen
 
 sealed class AppVmOperation {
     object Back : AppVmOperation()
     object Loading : AppVmOperation()
-    class ChangeScreen(val screen: ScreenState) : AppVmOperation()
+    class ChangeScreen(val screen: Screen) : AppVmOperation()
     class InitializeListStates(
         val latest: LazyListState,
         val top: LazyListState,

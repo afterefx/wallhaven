@@ -7,16 +7,18 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
@@ -33,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
@@ -42,15 +45,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.model.wallhavendata.WallpaperDetails
 import app.androiddev.wallhaven.ui.Screen
 import coil.compose.ImagePainter
-import coil.compose.ImagePainter.State.Empty.painter
 import coil.compose.rememberImagePainter
-import coil.decode.DataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -95,9 +97,8 @@ fun LoadingScreen() {
 fun ImageDetail(wallpaperDetails: WallpaperDetails) {
     val config = LocalConfiguration.current
     val screenWidth = config.screenWidthDp
+    val screenHeight = config.screenHeightDp
     var zoom by remember { mutableStateOf(1f) }
-    val panMinX by remember { derivedStateOf { ((392f - (392 * zoom)) / 2) } }
-    val panMaxX = 0f
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
     val panned = (offsetX != 0f || offsetY != 0f)
@@ -106,181 +107,204 @@ fun ImageDetail(wallpaperDetails: WallpaperDetails) {
     var origImageHeight by remember { mutableStateOf(0f) }
     var imageDisplayedWidth by remember { mutableStateOf(0f) }
     var imageDisplayedHeight by remember { mutableStateOf(0f) }
+    val panMinX by remember { derivedStateOf { ((imageDisplayedWidth - (imageDisplayedWidth * zoom)) / 2) } }
+    val panMaxX by remember { derivedStateOf { ((imageDisplayedWidth + (imageDisplayedWidth * zoom)) / 2 / 2) } }
+    val panMinY by remember { derivedStateOf { if (zoomedIn) ((imageDisplayedHeight - (imageDisplayedWidth * zoom)) / 2) else 0f } }
+    val panMaxY by remember { derivedStateOf { ((imageDisplayedHeight + (imageDisplayedWidth * zoom)) / 2 / 2) } }
 
     val scope = rememberCoroutineScope()
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .combinedClickable(
-            onDoubleClick = {
-                var end = 0f
-                if (panned || zoomedIn) {
-                    end = 1f
-                    offsetX = 0f
-                    offsetY = 0f
-                } else {
-                    end = 2f
-                }
-                scope.launch {
-                    animate(zoom, end) { value, _ ->
-                        zoom = value
+    Box(
+        modifier = Modifier
+            .zIndex(1f)
+            .fillMaxSize()
+            .combinedClickable(
+                onDoubleClick = {
+                    val end: Float
+                    if (panned || zoomedIn) {
+                        end = 1f
+                        offsetX = 0f
+                        offsetY = 0f
+                    } else {
+                        end = 2f
+                    }
+                    scope.launch {
+                        animate(zoom, end) { value, _ ->
+                            zoom = value
+                        }
+                    }
+                },
+                onClick = {}
+            )
+            .pointerInput(Unit) {
+                detectTransformGestures { _, p, z, _ ->
+                    if (zoom >= 1f) {
+                        zoom *= z
+                    } else {
+                        zoom = 1f
+                    }
+                    offsetX += p.x
+                    offsetY += p.y
+                    if (offsetX < panMinX) {
+                        offsetX = panMinX
+                    } else if (offsetX > panMaxX) {
+                        offsetX = panMaxX
+                    }
+
+                    if (offsetY < panMinY) {
+                        offsetY = panMinY
+                    } else if (offsetY > panMaxY) {
+                        offsetY = panMaxY
                     }
                 }
-            },
-            onClick = {}
-        )
-    ) {
-        item {
-            wallpaperDetails.let { data ->
-                Column(modifier = Modifier.fillMaxHeight()) {
+            }
+    )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+    wallpaperDetails.let { data ->
+        Column(modifier = Modifier.fillMaxSize()) {
 
-                    Box(
-                        Modifier
-                            .pointerInput(Unit) {
-                                detectTransformGestures { _, p, z, _ ->
-//                                    if (zoom >= 1f) zoom *= z else zoom = 1f
-                                    offsetX += p.x
-                                    offsetY += p.y
-                                    if (offsetX < panMinX) {
-                                        offsetX = panMinX
-                                    } else if (offsetX > panMaxX) {
-                                        offsetX = panMaxX
-                                    }
-                                }
-                            }
-                    ) {
-                        var statusText by remember { mutableStateOf("") }
-                        var showLoading by remember { mutableStateOf(false) }
-                        val imagepainter = rememberImagePainter(data.path)
+            Spacer(modifier = Modifier.height(8.dp))
 
-                        when (imagepainter.state) {
-                            is ImagePainter.State.Success -> {
-                                // Perform the transition animation.
-                                statusText = ""
-                                showLoading = false
-                                origImageWidth = //it.image?.width?.toFloat() ?: 0f
-                                    imagepainter.intrinsicSize.width
-                                origImageHeight = //it.image?.height?.toFloat() ?: 0f
-                                    imagepainter.intrinsicSize.height
-                                imageDisplayedWidth =
-                                    (screenWidth / origImageWidth) * origImageWidth
-                                imageDisplayedHeight =
-                                    (screenWidth / origImageWidth) * origImageHeight
-                            }
-                            ImagePainter.State.Empty -> {
-                                statusText = "Empty"
-                                showLoading = true
-                            }
-                            is ImagePainter.State.Loading -> {
-                                showLoading = true
-                            }
-                            is ImagePainter.State.Error -> {
-                                statusText = "Error"
-                                showLoading = true
-                            }
-                        }
-//                        if (state is ImagePainter.State.Success && state.metadata.dataSource != DataSource.MEMORY_CACHE ) { }
+            val imageDisplayedModifier = if (zoomedIn) Modifier else Modifier.clipToBounds()
+            Box(modifier = imageDisplayedModifier.fillMaxWidth()) {
+                var statusText by remember { mutableStateOf("") }
+                var showLoading by remember { mutableStateOf(false) }
 
-                        if (showLoading) {
-                            CircularProgressIndicator()
-                        }
-                        if (statusText.isNotEmpty()) {
-                            Text(statusText)
-                        }
-                        Image(
-                            painter = imagepainter,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .clipToBounds()
-                                .graphicsLayer(scaleX = zoom, scaleY = zoom)
-                                .offset {
-                                    IntOffset(
-                                        offsetX
-                                            .coerceIn(panMinX..0f)
-                                            .roundToInt(),
-                                        offsetY
-                                            .roundToInt()
-                                    )
-                                }
-                        )
+                val imagePainter = rememberImagePainter(data.path)
+                when (imagePainter.state) {
+                    is ImagePainter.State.Success -> {
+                        // Perform the transition animation.
+                        statusText = ""
+                        showLoading = false
+                        origImageWidth = //it.image?.width?.toFloat() ?: 0f
+                            imagePainter.intrinsicSize.width
+                        origImageHeight = //it.image?.height?.toFloat() ?: 0f
+                            imagePainter.intrinsicSize.height
+                        imageDisplayedWidth =
+                            (screenWidth / origImageWidth) * origImageWidth
+                        imageDisplayedHeight =
+                            (screenWidth / origImageWidth) * origImageHeight
                     }
-                    if (true) {
-                        Column {
-                            TextLabel(label = "screenWidthDp", content = screenWidth.toString())
-                            TextLabel(label = "origWidth", content = origImageWidth.toString())
-                            TextLabel(label = "origHeight", content = origImageHeight.toString())
-                            TextLabel(label = "width", content = imageDisplayedWidth.toString())
-                            TextLabel(label = "height", content = imageDisplayedHeight.toString())
-                            TextLabel("Scale", zoom.toString())
-                            TextLabel("xOffset", offsetX.roundToInt().toString())
-                            TextLabel(label = "yOffset", content = offsetY.roundToInt().toString())
-                            TextLabel("xOffsetDp", offsetX.roundToInt().dp.toString())
-                            TextLabel(
-                                label = "yOffsetDp",
-                                content = offsetY.roundToInt().dp.toString()
-                            )
-                            TextLabel(
-                                label = "minX",
-                                content = (0f - ((imageDisplayedWidth * zoom) / 2)).toString()
-                            )
-                            TextLabel(
-                                label = "minY",
-                                content = (0f - ((imageDisplayedHeight * zoom) / 2)).toString()
+                    ImagePainter.State.Empty -> {
+                        statusText = "Empty"
+                        showLoading = true
+                    }
+                    is ImagePainter.State.Loading -> {
+                        showLoading = true
+                    }
+                    is ImagePainter.State.Error -> {
+                        statusText = "Error"
+                        showLoading = true
+                    }
+                }
+
+                Image(
+                    painter = imagePainter,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(200.dp)
+                        .graphicsLayer(scaleX = zoom, scaleY = zoom)
+                        .offset {
+                            IntOffset(
+                                offsetX
+                                    .coerceIn(panMinX..panMaxX)
+                                    .roundToInt(),
+                                offsetY
+                                    .coerceIn(panMinY..panMaxY)
+                                    .roundToInt()
                             )
                         }
-                    }
+                )
+                if (showLoading) CircularProgressIndicator()
+                if (statusText.isNotEmpty()) Text(statusText)
+            }
+            if (false) {
+                Column {
+                    TextLabel(label = "screenWidthDp", content = screenWidth.toString())
+                    TextLabel(label = "screenHeightDp", content = screenHeight.toString())
+                    TextLabel(label = "origWidth", content = origImageWidth.toString())
+                    TextLabel(label = "origHeight", content = origImageHeight.toString())
+                    TextLabel(label = "width", content = imageDisplayedWidth.toString())
+                    TextLabel(label = "height", content = imageDisplayedHeight.toString())
+                    TextLabel(label = "panMinX", content = panMinX.toString())
+                    TextLabel(label = "panMaxX", content = panMaxX.toString())
 
-                    if (zoom <= 1f) {
-                        Column(modifier = Modifier.padding(24.dp)) {
+                    TextLabel("Scale", zoom.toString())
+                    TextLabel("xOffset", offsetX.roundToInt().toString())
+                    TextLabel(label = "yOffset", content = offsetY.roundToInt().toString())
+                    TextLabel("xOffsetDp", offsetX.roundToInt().dp.toString())
+                    TextLabel(
+                        label = "yOffsetDp",
+                        content = offsetY.roundToInt().dp.toString()
+                    )
+                    TextLabel(
+                        label = "minX",
+                        content = (0f - ((imageDisplayedWidth * zoom) / 2)).toString()
+                    )
+                    TextLabel(
+                        label = "minY",
+                        content = (0f - ((imageDisplayedHeight * zoom) / 2)).toString()
+                    )
+                }
+            }
 
-                            Spacer(modifier = Modifier.height(8.dp))
+            if (!zoomedIn) ImageInfo(data)
+        }
+    }
 
-                            Label(text = "Category: ") {
-                                Text(text = data.category, style = MaterialTheme.typography.body1)
-                            }
+}
 
-                            Label(text = "Colors:") {
-                                ColorTable(data.colors)
-                            }
+@Composable
+fun ImageInfo(data: WallpaperDetails) {
 
-                            Label("Tags:")
-                            Table(items = data.tags.map { it.name }, maxItemsPerRow = 3) {
-                                Text(text = it)
-                                Spacer(modifier = Modifier.width(4.dp))
-                            }
+    Column(modifier = Modifier.padding(24.dp)) {
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Label(text = "Category: ") {
+            Text(text = data.category, style = MaterialTheme.typography.body1)
+        }
+
+        Label(text = "Colors:") {
+            ColorTable(data.colors)
+        }
+
+        Label("Tags:")
+        Table(items = data.tags.map { it.name }, maxItemsPerRow = 3) {
+            Text(text = it)
+            Spacer(modifier = Modifier.width(4.dp))
+        }
 
 
-                            Label(text = "Uploader: ") {
-                                Text(
-                                    text = data.uploader.username,
-                                    style = MaterialTheme.typography.body1
-                                )
-                            }
-                            Label(text = "Created: ") {
-                                Text(text = data.created_at, style = MaterialTheme.typography.body1)
-                            }
-                            Label(text = "Purity: ") {
-                                Text(text = data.purity, style = MaterialTheme.typography.body1)
-                            }
-                            Label(text = "Ratio: ") {
-                                Text(text = data.ratio, style = MaterialTheme.typography.body1)
-                            }
-                            Label(text = "Resolution: ") {
-                                Text(text = data.resolution, style = MaterialTheme.typography.body1)
-                            }
-                            Label(text = "Views: ") {
-                                Text(
-                                    text = data.views.toString(),
-                                    style = MaterialTheme.typography.body1
-                                )
-                            }
-                            Label(text = "Favorites: ") {
-                                Text(
-                                    text = data.favorites.toString(),
-                                    style = MaterialTheme.typography.body1
-                                )
-                            }
+        Label(text = "Uploader: ") {
+            Text(
+                text = data.uploader.username,
+                style = MaterialTheme.typography.body1
+            )
+        }
+        Label(text = "Created: ") {
+            Text(text = data.created_at, style = MaterialTheme.typography.body1)
+        }
+        Label(text = "Purity: ") {
+            Text(text = data.purity, style = MaterialTheme.typography.body1)
+        }
+        Label(text = "Ratio: ") {
+            Text(text = data.ratio, style = MaterialTheme.typography.body1)
+        }
+        Label(text = "Resolution: ") {
+            Text(text = data.resolution, style = MaterialTheme.typography.body1)
+        }
+        Label(text = "Views: ") {
+            Text(
+                text = data.views.toString(),
+                style = MaterialTheme.typography.body1
+            )
+        }
+        Label(text = "Favorites: ") {
+            Text(
+                text = data.favorites.toString(),
+                style = MaterialTheme.typography.body1
+            )
+        }
 /*
                         val created_at: String,
                         val dimension_x: Int,
@@ -301,11 +325,6 @@ fun ImageDetail(wallpaperDetails: WallpaperDetails) {
                         val url: String,
                         val views: Int
 */
-                        }
-                    }
-                }
-            }
-        }
     }
 
 }
@@ -341,7 +360,9 @@ private fun Table(
 private fun ColorBox(colorString: String) {
     val color = colorString.toColor()
     Box(
-        modifier = Modifier.background(color)
+        modifier = Modifier
+            .background(color)
+            .padding(1.dp)
     ) {
         Text(
             text = colorString,

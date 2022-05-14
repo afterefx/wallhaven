@@ -50,6 +50,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = composeVersion
     }
+    namespace = "app.androiddev.wallhaven"
 }
 dependencies {
 //    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")

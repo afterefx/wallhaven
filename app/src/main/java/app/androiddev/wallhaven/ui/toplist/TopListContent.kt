@@ -1,5 +1,6 @@
 package app.androiddev.wallhaven.ui.toplist
 
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -13,7 +14,7 @@ fun TopList(navController: NavController) {
         GalleryPage<TopListViewModel>(
             navController,
             operation = GalleryOperation.GetTopListPage,
-            lazyListState = vs.topListState ?: rememberLazyListState(),
+            lazyListState = vs.topListState ?: rememberLazyGridState(),
         )
     }
 }

@@ -7,6 +7,15 @@
         <entry key="../../../../layout/compose-model-1614462746748.xml" value="0.16835443037974684" />
         <entry key="../../../../layout/compose-model-1614463718333.xml" value="0.16554054054054054" />
         <entry key="../../../../layout/compose-model-1614572148610.xml" value="0.2890295358649789" />
+        <entry key="app/src/debug/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1735" />
+        <entry key="app/src/main/res/drawable/ic_account_circle_white_24dp.xml" value="0.2185" />
+        <entry key="app/src/main/res/drawable/ic_chat_white_24dp.xml" value="0.2185" />
+        <entry key="app/src/main/res/drawable/ic_favorite_white_24dp.xml" value="0.2185" />
+        <entry key="app/src/main/res/drawable/ic_home_white_24dp.xml" value="0.2185" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.2185" />
+        <entry key="app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.1735" />
+        <entry key="app/src/main/res/drawable/ic_random.xml" value="0.2185" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2185" />
       </map>
     </option>
   </component>

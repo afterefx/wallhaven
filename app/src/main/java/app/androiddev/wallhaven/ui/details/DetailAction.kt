@@ -11,9 +11,11 @@ class DetailAction {
         detailsViewModel: WallPaperDetailsViewModel,
     ) =
         when (op) {
-            is DetailMVOperation.GetWallpaper -> detailsViewModel.userIntentChannel.offer(
+            is DetailMVOperation.GetWallpaper -> detailsViewModel.userIntentChannel.trySend(
                 DetailsUserIntent.GetWallpaper(op.id)
-            )
-            DetailMVOperation.Loading -> detailsViewModel.userIntentChannel.offer(DetailsUserIntent.Loading)
+            ).isSuccess
+            DetailMVOperation.Loading -> detailsViewModel.userIntentChannel.trySend(
+                DetailsUserIntent.Loading
+            ).isSuccess
         }
 }

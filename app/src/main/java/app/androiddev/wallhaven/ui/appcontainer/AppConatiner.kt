@@ -1,5 +1,6 @@
 package app.androiddev.wallhaven.ui.appcontainer
 
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -141,9 +142,9 @@ fun AppContent(
     ) {
         AppAction.action(
             AppVmOperation.InitializeListStates(
-                latest = rememberLazyListState(),
-                top = rememberLazyListState(),
-                random = rememberLazyListState()
+                latest = rememberLazyGridState(),
+                top = rememberLazyGridState(),
+                random = rememberLazyGridState()
             ),
             vm
         )

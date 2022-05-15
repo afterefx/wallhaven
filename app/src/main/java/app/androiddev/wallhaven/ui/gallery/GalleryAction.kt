@@ -14,18 +14,10 @@ class GalleryAction {
         page: Int = 1
     ) {
         when (op) {
-            GalleryOperation.GetLatestPage -> vm.userIntentChannel.offer(
-                GalleryUserIntent.GetLatestPage(page)
-            )
-            GalleryOperation.GetTopListPage -> vm.userIntentChannel.offer(
-                GalleryUserIntent.GetTopListPage(page)
-            )
-            GalleryOperation.GetRandomListPage -> vm.userIntentChannel.offer(
-                GalleryUserIntent.GetRandomPage(page)
-            )
-            GalleryOperation.Loading -> vm.userIntentChannel.offer(
-                GalleryUserIntent.Loading
-            )
+            GalleryOperation.GetLatestPage -> vm.userIntentChannel.trySend(GalleryUserIntent.GetLatestPage(page)).isSuccess
+            GalleryOperation.GetTopListPage -> vm.userIntentChannel.trySend(GalleryUserIntent.GetTopListPage(page)).isSuccess
+            GalleryOperation.GetRandomListPage -> vm.userIntentChannel.trySend(GalleryUserIntent.GetRandomPage(page)).isSuccess
+            GalleryOperation.Loading -> vm.userIntentChannel.trySend(GalleryUserIntent.Loading).isSuccess
         }
     }
 }

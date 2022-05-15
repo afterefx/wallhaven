@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
@@ -41,12 +44,11 @@ import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 inline fun <reified T : GalleryViewModel> GalleryPage(
     navController: NavController,
     operation: GalleryOperation,
-    lazyListState: LazyListState = rememberLazyListState(),
+    lazyListState: LazyGridState = rememberLazyGridState(),
 ) {
     val viewModel: T = hiltViewModel()
     val state by viewModel.state.collectAsState()
@@ -100,11 +102,11 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
             LoadingScreen()
         } else {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(2),
+                columns = GridCells.Fixed(2),
                 state = lazyListState,
                 contentPadding = PaddingValues(bottom = 100.dp),
             ) {
-                items(state.list ?: emptyList()) { wallpaper ->
+                items(items = state.list ?: emptyList()) { wallpaper ->
                     ThumbNail(
                         wallpaper,
                         Modifier.clickable(onClick = {

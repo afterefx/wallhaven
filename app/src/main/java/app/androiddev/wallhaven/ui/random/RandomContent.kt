@@ -3,7 +3,10 @@ package app.androiddev.wallhaven.ui.random
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -14,14 +17,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import app.androiddev.wallhaven.ui.appcontainer.AppContent
 import app.androiddev.wallhaven.ui.gallery.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun RandomContent(navController: NavController) {
-    AppContent { vm, vs ->
-        val lazyListState = vs.randomListState ?: rememberLazyListState()
+    AppContent { _, vs ->
+        val lazyListState = vs.randomListState ?: rememberLazyGridState()
         val operation = GalleryOperation.GetRandomListPage
 
         val viewModel: RandomViewModel = hiltViewModel()
@@ -50,8 +51,8 @@ fun RandomContent(navController: NavController) {
             if (state.loading) {
                 LoadingScreen()
             } else {
-                LazyVerticalGrid(cells = GridCells.Fixed(2), state = lazyListState) {
-                    items(state.list ?: emptyList()) { wallpaper ->
+                LazyVerticalGrid(columns = GridCells.Fixed(2), state = lazyListState) {
+                    items(items = state.list ?: emptyList()) { wallpaper ->
                         ThumbNail(
                             wallpaper,
                             Modifier.clickable(onClick = {

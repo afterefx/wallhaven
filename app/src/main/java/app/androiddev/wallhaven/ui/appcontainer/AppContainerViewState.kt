@@ -1,6 +1,7 @@
 package app.androiddev.wallhaven.ui.appcontainer
 
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import app.androiddev.wallhaven.ui.Screen
 import app.androiddev.wallhaven.ui.WallHavenRepository
 import app.androiddev.wallhaven.util.StateChannel
@@ -12,9 +13,9 @@ data class AppContainerViewState(
     val currentScreen: Screen = Screen.Latest,
     val wallpaperDetailId: String? = null,
     val previousScreens: Stack<Screen>? = null,
-    val latestListState: LazyListState? = null,
-    val topListState: LazyListState? = null,
-    val randomListState: LazyListState? = null,
+    val latestListState: LazyGridState? = null,
+    val topListState: LazyGridState? = null,
+    val randomListState: LazyGridState? = null,
 )
 
 /**
@@ -26,9 +27,9 @@ sealed class AppUserIntent {
     object Loading : AppUserIntent()
     object PreviousScreen : AppUserIntent()
     class InitializeListStates(
-        val latest: LazyListState,
-        val top: LazyListState,
-        val random: LazyListState
+        val latest: LazyGridState,
+        val top: LazyGridState,
+        val random: LazyGridState
     ) : AppUserIntent()
 }
 

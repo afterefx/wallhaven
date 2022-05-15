@@ -1,6 +1,7 @@
 package app.androiddev.wallhaven.ui.appcontainer
 
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import app.androiddev.wallhaven.ui.Screen
 
 sealed class AppVmOperation {
@@ -8,9 +9,9 @@ sealed class AppVmOperation {
     object Loading : AppVmOperation()
     class ChangeScreen(val screen: Screen) : AppVmOperation()
     class InitializeListStates(
-        val latest: LazyListState,
-        val top: LazyListState,
-        val random: LazyListState
+        val latest: LazyGridState,
+        val top: LazyGridState,
+        val random: LazyGridState
     ) : AppVmOperation()
 }
 
@@ -21,18 +22,18 @@ object AppAction {
     ) {
         val userIntentChannel = appContainerViewModel.userIntentChannel
         when (op) {
-            AppVmOperation.Back -> userIntentChannel.offer(
+            AppVmOperation.Back -> userIntentChannel.trySend(
                 AppUserIntent.PreviousScreen
-            )
-            AppVmOperation.Loading -> userIntentChannel.offer(
+            ).isSuccess
+            AppVmOperation.Loading -> userIntentChannel.trySend(
                 AppUserIntent.Loading
-            )
-            is AppVmOperation.ChangeScreen -> userIntentChannel.offer(
+            ).isSuccess
+            is AppVmOperation.ChangeScreen -> userIntentChannel.trySend(
                 AppUserIntent.ChangeScreen(op.screen)
-            )
-            is AppVmOperation.InitializeListStates -> userIntentChannel.offer(
+            ).isSuccess
+            is AppVmOperation.InitializeListStates -> userIntentChannel.trySend(
                 AppUserIntent.InitializeListStates(op.latest, op.top, op.random)
-            )
+            ).isSuccess
         }
     }
 }

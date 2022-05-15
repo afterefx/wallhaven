@@ -1,5 +1,6 @@
 package app.androiddev.wallhaven.ui.latest
 
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -13,9 +14,7 @@ fun LatestContent(navController: NavHostController) {
         GalleryPage<LatestViewModel>(
             navController,
             operation = GalleryOperation.GetLatestPage,
-            lazyListState =
-            appViewState.latestListState
-                ?: rememberLazyListState(),
+            lazyListState = appViewState.latestListState ?: rememberLazyGridState(),
         )
     }
 }

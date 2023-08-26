@@ -40,19 +40,16 @@ fun AppContainer() {
 
     val navController = rememberNavController()
     DynamicTheme(colors = colors) {
-        val scope = rememberCoroutineScope()
         LaunchedEffect(true) {
-            scope.launch(Dispatchers.IO) {
-                Thread.sleep(3000)
-                colors.updateColors("#232323".toColor(), Color.White)
-            }
+            Thread.sleep(3000)
+            colors.updateColors("#232323".toColor(), Color.White)
         }
         Scaffold(
             topBar = { TitleContent(navController) },
             content = { paddingValues ->
                 NavHost(navController = navController, startDestination = Screen.Latest.route) {
                     composable(Screen.Latest.route) {
-                        LatestContent(paddingValues,navController)
+                        LatestContent(paddingValues, navController)
                     }
                     composable(Screen.Detail.route) { backStackEntry ->
                         WallPaperDetailsContent(
@@ -74,6 +71,7 @@ fun AppContainer() {
                     Screen.TopList.route,
                     Screen.Random.route ->
                         BottomNavigation(navController)
+
                     Screen.Detail.route -> {
                         //no bottom bar
                     }

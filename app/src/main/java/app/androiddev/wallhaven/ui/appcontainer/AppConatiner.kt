@@ -1,7 +1,6 @@
 package app.androiddev.wallhaven.ui.appcontainer
 
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -27,7 +26,6 @@ import app.androiddev.wallhaven.ui.latest.LatestContent
 import app.androiddev.wallhaven.ui.random.RandomContent
 import app.androiddev.wallhaven.ui.toplist.TopList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 @Composable
@@ -125,7 +123,6 @@ fun TopAppBar(title: String, navigationIcon: @Composable (() -> Unit)? = null) {
     )
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun AppContent(
     content: @Composable (

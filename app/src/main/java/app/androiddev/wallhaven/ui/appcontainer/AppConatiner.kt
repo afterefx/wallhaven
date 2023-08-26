@@ -41,9 +41,11 @@ fun AppContainer() {
     val navController = rememberNavController()
     DynamicTheme(colors = colors) {
         val scope = rememberCoroutineScope()
-        scope.launch(Dispatchers.IO) {
-            Thread.sleep(3000)
-            colors.updateColors("#232323".toColor(), Color.White)
+        LaunchedEffect(true) {
+            scope.launch(Dispatchers.IO) {
+                Thread.sleep(3000)
+                colors.updateColors("#232323".toColor(), Color.White)
+            }
         }
         Scaffold(
             topBar = { TitleContent(navController) },

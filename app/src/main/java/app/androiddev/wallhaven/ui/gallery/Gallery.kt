@@ -102,7 +102,7 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
                 contentPadding = PaddingValues(bottom = 100.dp),
             ) {
                 items(items = state.list ?: emptyList()) { wallpaper ->
-                    ThumbNail(
+                    Thumbnail(
                         wallpaper,
                         Modifier.clickable(onClick = {
                             navController.navigate("detail/${wallpaper.id}")
@@ -115,7 +115,7 @@ inline fun <reified T : GalleryViewModel> GalleryPage(
 }
 
 @Composable
-fun ThumbNail(wallpaper: WallpaperDetails, modifier: Modifier = Modifier) {
+fun Thumbnail(wallpaper: WallpaperDetails, modifier: Modifier = Modifier) {
     val painter = rememberImagePainter(data = wallpaper.thumbs.small)
     if (painter.state is ImagePainter.State.Loading) {
         Column(

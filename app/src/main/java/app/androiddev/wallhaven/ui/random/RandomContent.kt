@@ -27,7 +27,7 @@ import app.androiddev.wallhaven.ui.appcontainer.AppContent
 import app.androiddev.wallhaven.ui.gallery.GalleryAction
 import app.androiddev.wallhaven.ui.gallery.GalleryOperation
 import app.androiddev.wallhaven.ui.gallery.LoadingScreen
-import app.androiddev.wallhaven.ui.gallery.ThumbNail
+import app.androiddev.wallhaven.ui.gallery.Thumbnail
 import kotlinx.coroutines.launch
 
 @Composable
@@ -64,7 +64,7 @@ fun RandomContent(navController: NavController) {
             } else {
                 LazyVerticalGrid(columns = GridCells.Fixed(2), state = lazyListState) {
                     items(items = state.list ?: emptyList()) { wallpaper ->
-                        ThumbNail(
+                        Thumbnail(
                             wallpaper,
                             Modifier.clickable(onClick = {
                                 navController.navigate("detail/${wallpaper.id}")

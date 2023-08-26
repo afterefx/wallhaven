@@ -1,25 +1,42 @@
 package app.androiddev.wallhaven.ui
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import app.androiddev.wallhaven.R
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import app.androiddev.wallhaven.ui.appcontainer.AppAction
+import app.androiddev.wallhaven.ui.appcontainer.AppContainer
+import app.androiddev.wallhaven.ui.appcontainer.AppContent
+import app.androiddev.wallhaven.ui.appcontainer.AppVmOperation
+import app.androiddev.wallhaven.auth.ILoginController
+import app.androiddev.wallhaven.ui.login.LoginUi
+import app.androiddev.wallhaven.ui.login.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity @Inject constructor(
+) : AppCompatActivity() {
+
+    @Inject
+    lateinit var loginController: ILoginController
+
+    private val loginViewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            WallHavenApp(
-                sharedPref = getSharedPreferences(
-                    getString(R.string.sharedpref),
-                    Context.MODE_PRIVATE
-                )
-            )
+            val isLoggedIn by loginController.isLoggedIn.collectAsState()
+
+            if (isLoggedIn) AppContainer { loginController.logout() }
+            else LoginUi { user, pass ->
+                loginViewModel.doLogin(user, pass) { apiKey ->
+                    loginController.login(apiKey)
+                }
+            }
         }
     }
 }

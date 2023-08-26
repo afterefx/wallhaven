@@ -19,10 +19,12 @@ import app.androiddev.wallhaven.extensions.toColor
 import app.androiddev.wallhaven.theme.ColorState
 import app.androiddev.wallhaven.theme.DarkColorPalette
 import app.androiddev.wallhaven.theme.DynamicTheme
+import app.androiddev.wallhaven.theme.WallHavenTheme
 import app.androiddev.wallhaven.ui.Screen
 import app.androiddev.wallhaven.ui.details.WallPaperDetailsContent
 import app.androiddev.wallhaven.ui.getScreen
 import app.androiddev.wallhaven.ui.latest.LatestContent
+import app.androiddev.wallhaven.ui.profile.ProfileContent
 import app.androiddev.wallhaven.ui.random.RandomContent
 import app.androiddev.wallhaven.ui.toplist.TopList
 import kotlinx.coroutines.Dispatchers
@@ -35,15 +37,16 @@ fun NavHostController.currentRoute(): String? {
 }
 
 @Composable
-fun AppContainer() {
-    val colors = remember { ColorState(DarkColorPalette.primary, DarkColorPalette.onPrimary) }
+fun AppContainer(onLogout: () -> Unit) {
+//    val colors by remember { mutableStateOf( ColorState(DarkColorPalette.primary, DarkColorPalette.onPrimary)) }
 
     val navController = rememberNavController()
-    DynamicTheme(colors = colors) {
-        LaunchedEffect(true) {
-            Thread.sleep(3000)
-            colors.updateColors("#232323".toColor(), Color.White)
-        }
+//    DynamicTheme(colors = colors) {
+    WallHavenTheme {
+//        LaunchedEffect(true) {
+//            Thread.sleep(3000)
+//            colors.updateColors("#232323".toColor(), Color.White)
+//        }
         Scaffold(
             topBar = { TitleContent(navController) },
             content = { paddingValues ->
@@ -63,13 +66,18 @@ fun AppContainer() {
                     composable(Screen.Random.route) {
                         RandomContent(navController)
                     }
+
+                    composable(Screen.Profile.route) {
+                        ProfileContent(onLogout)
+                    }
                 }
             },
             bottomBar = {
                 when (navController.currentRoute()) {
                     Screen.Latest.route,
                     Screen.TopList.route,
-                    Screen.Random.route ->
+                    Screen.Random.route,
+                    Screen.Profile.route->
                         BottomNavigation(navController)
 
                     Screen.Detail.route -> {
@@ -86,7 +94,8 @@ fun BottomNavigation(navController: NavHostController) {
     val items = listOf(
         Screen.Latest,
         Screen.TopList,
-        Screen.Random
+        Screen.Random,
+        Screen.Profile
     )
     androidx.compose.material.BottomNavigation {
         items.forEach { screen ->

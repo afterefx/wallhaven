@@ -2,6 +2,9 @@ package app.androiddev.wallhaven.di
 
 import android.content.Context
 import app.androiddev.wallhaven.R
+import app.androiddev.wallhaven.auth.ApiKeyController
+import app.androiddev.wallhaven.auth.IApiKeyController
+import app.androiddev.wallhaven.auth.di.AuthModule
 import app.androiddev.wallhaven.network.WallHavenApi
 import dagger.Module
 import dagger.Provides
@@ -22,7 +25,7 @@ import javax.inject.Named
  * Module which provides all required dependencies about network
  */
 @InstallIn(SingletonComponent::class)
-@Module
+@Module(includes = [AuthModule::class])
 @Suppress("unused")
 object NetworkModule {
 
@@ -39,25 +42,19 @@ object NetworkModule {
     @Named("api")
     internal fun provideWallHavenClientApi(
         @Named("apikey") okHttpClient: OkHttpClient.Builder
-    ): Retrofit {
-
-        return Retrofit.Builder()
+    ): Retrofit =
+        Retrofit.Builder()
             .baseUrl("https://wallhaven.cc/api/v1/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient.build())
             .build()
-    }
 
     @Provides
     @Reusable
     @JvmStatic
     @Named("apikey")
-    internal fun provideOkHttp(@ApplicationContext context: Context): OkHttpClient.Builder {
-        val sharedPref = context.getSharedPreferences(
-            context.getString(R.string.sharedpref),
-            Context.MODE_PRIVATE
-        )
-        val apikey = sharedPref.getString(context.getString(R.string.API_KEY), "")
+    internal fun provideOkHttp(apiKeyController: IApiKeyController): OkHttpClient.Builder {
+        val apikey = apiKeyController.getApiKey()
         val logging = HttpLoggingInterceptor()
         logging.level = HttpLoggingInterceptor.Level.BODY
 

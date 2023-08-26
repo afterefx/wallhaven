@@ -1,9 +1,8 @@
 package app.androiddev.wallhaven.ui.appcontainer
 
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import app.androiddev.wallhaven.ui.Screen
-import app.androiddev.wallhaven.ui.WallHavenRepository
+import app.androiddev.wallhaven.auth.ILoginController
 import app.androiddev.wallhaven.util.StateChannel
 import java.util.*
 import javax.inject.Inject
@@ -31,13 +30,15 @@ sealed class AppUserIntent {
         val top: LazyGridState,
         val random: LazyGridState
     ) : AppUserIntent()
+
+    object Logout : AppUserIntent()
 }
 
 /**
  * The ViewModel acts upon these events accordingly by making API calls or saving/retrieving data in the database via the Repository layer.
  */
 class AppContainerStateChannel @Inject constructor(
-    private val repository: WallHavenRepository
+    private val loginController: ILoginController
 ) : StateChannel<AppContainerViewState, AppUserIntent>(AppContainerViewState()) {
 
     override suspend fun reducer(
@@ -73,5 +74,11 @@ class AppContainerStateChannel @Inject constructor(
                     wallpaperDetailId = null,
                 )
             }
+
+            AppUserIntent.Logout -> {
+                loginController.logout()
+                _state.value
+            }
+
         }
 }

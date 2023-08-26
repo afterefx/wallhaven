@@ -60,7 +60,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun WallPaperDetailsContent(navController: NavController, id: String) {
-    if (id.isNullOrEmpty()) navController.navigate(Screen.Latest.route)
+    if (id.isEmpty()) navController.navigate(Screen.Latest.route)
     val viewModel: WallPaperDetailsViewModel = hiltViewModel()
     val viewState: WallpaperDetailsViewState by viewModel.state.collectAsState()
     val vmAction = DetailAction()

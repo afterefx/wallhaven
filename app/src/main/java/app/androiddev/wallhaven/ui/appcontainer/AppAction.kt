@@ -1,6 +1,5 @@
 package app.androiddev.wallhaven.ui.appcontainer
 
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import app.androiddev.wallhaven.ui.Screen
 
@@ -13,6 +12,7 @@ sealed class AppVmOperation {
         val top: LazyGridState,
         val random: LazyGridState
     ) : AppVmOperation()
+    object Logout : AppVmOperation()
 }
 
 object AppAction {
@@ -33,6 +33,9 @@ object AppAction {
             ).isSuccess
             is AppVmOperation.InitializeListStates -> userIntentChannel.trySend(
                 AppUserIntent.InitializeListStates(op.latest, op.top, op.random)
+            ).isSuccess
+            AppVmOperation.Logout -> userIntentChannel.trySend(
+                AppUserIntent.Logout
             ).isSuccess
         }
     }

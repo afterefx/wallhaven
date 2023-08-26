@@ -13,13 +13,16 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module(includes = [NetworkModule::class])
-class AppModule {
-    @Provides
-    @Singleton
-    fun providesWallhavenRepository(
-        @ApplicationContext context: Context,
-        wallHavenApi: WallHavenApi,
-    ): WallHavenRepository =
-        WallHavenRepository(context, wallHavenApi)
+abstract class AppModule {
+    companion object {
+        @Provides
+        @Singleton
+        fun providesWallhavenRepository(
+            @ApplicationContext context: Context,
+            wallHavenApi: WallHavenApi,
+        ): WallHavenRepository =
+            WallHavenRepository(context, wallHavenApi)
+
+    }
 
 }

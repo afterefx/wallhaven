@@ -30,7 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.androiddev.wallhaven.extensions.toColor
 
 @Composable
-fun LoginUi(saveApiToken: (String) -> Unit = {}) {
+fun LoginUi(onSubmit: (String, String) -> Unit = {_,_ -> }) {
     Surface(color = "#0D4390".toColor(), modifier = Modifier.fillMaxSize()) {
 
         Column(modifier = Modifier.padding(16.dp)) {
@@ -75,13 +75,9 @@ fun LoginUi(saveApiToken: (String) -> Unit = {}) {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            val vm: LoginViewModel = viewModel()
-            val onSubmit = {
-                vm.doLogin(username, password, saveApiToken)
-            }
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Button(modifier = Modifier.padding(top = 4.dp), onClick = onSubmit) {
+                Button(modifier = Modifier.padding(top = 4.dp), onClick = {onSubmit(username, password)}) {
                     Text(text = "Submit")
                 }
             }

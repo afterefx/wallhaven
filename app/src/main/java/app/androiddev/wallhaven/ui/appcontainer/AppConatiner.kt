@@ -47,10 +47,10 @@ fun AppContainer() {
         }
         Scaffold(
             topBar = { TitleContent(navController) },
-            content = {
+            content = { paddingValues ->
                 NavHost(navController = navController, startDestination = Screen.Latest.route) {
                     composable(Screen.Latest.route) {
-                        LatestContent(navController)
+                        LatestContent(paddingValues,navController)
                     }
                     composable(Screen.Detail.route) { backStackEntry ->
                         WallPaperDetailsContent(
